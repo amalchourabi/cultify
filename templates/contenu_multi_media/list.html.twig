@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello jardinController!{% endblock %}
+
+{% block body %}
+<h1>ContenusMultiMedia List </h1>
+<a href="{{path('app_contenu_multi_media_new')}}">Add MultiMedia</a>
+<div>
+{% if ContenusMultiMedia is defined and ContenusMultiMedia is not empty %}
+<p>Tableau contient des données.</p>
+{% else %}
+<p>Tableau vide.</p>
+{% endif %}
+{% for i in ContenusMultiMedia %}
+<p> <b> Titre Media : </b> {{ i.TitreMedia | upper }} </p>
+<p> <b> TextMedia : </b> {{ i.TextMedia}} </p>
+<p> <b> PhotoMedia : </b></p>
+{% if i.photoMedia %}
+  
+    <img src="{{asset('image/' ~ i.photoMedia)}}" alt="{i.PhotoMedia}}" height="150px" />
+
+{% else %}
+    <p>Aucune image disponible</p>
+{% endif %}
+<p> <b> Categorie Media : </b> {{ i.CategorieMedia | upper }} </p>
+<p><b>Publication Date : </b> {{ i.DateMedia | date('d-m-Y') }}  </p>
+
+<a href="{{path('app_contenu_multi_media_edit',{id: i.idContenu})}}">Edit<a/>
+<a href="{{path('app_contenu_multi_media_remove',{id: i.idContenu})}}">Delete<a/>
+
+<hr>
+{% else %}
+<p>Le Tableau est vide.</p>
+{% endfor %}
+
+
+</div>
+{% endblock %}

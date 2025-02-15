@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello QuizController!{% endblock %}
+
+{% block body %}
+<h1>Quizs List </h1>
+<a href="{{path('app_quiz_new')}}">Add MultiMedia</a>
+<div>
+{% if Quizs is defined and Quizs is not empty %}
+<p>Tableau contient des données.</p>
+{% else %}
+<p>Tableau vide.</p>
+{% endif %}
+{% for i in Quizs %}
+<p> <b> TitreQuiz : </b> {{ i.TitreQuiz | upper }} </p>
+<p><b>Publication Date : </b> {{ i.DateQuiz | date('d-m-Y') }}  </p>
+<p> <b> ReponseChoisit : </b> {{ i.ReponseChoisit }} </p>
+<a href="{{path('app_quiz_edit',{id: i.idQuiz})}}">Edit<a/>
+<a href="{{path('app_quiz_remove',{id: i.idQuiz})}}">Delete<a/>
+
+<hr>
+{% else %}
+<p>Le Tableau est vide.</p>
+{% endfor %}
+
+
+</div>
+{% endblock %}

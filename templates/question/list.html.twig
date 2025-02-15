@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello QuestionController!{% endblock %}
+
+{% block body %}
+<h1>Questions List </h1>
+<a href="{{path('app_question_new')}}">Add MultiMedia</a>
+<div>
+{% if Questions is defined and Questions is not empty %}
+<p>Tableau contient des données.</p>
+{% else %}
+<p>Tableau vide.</p>
+{% endif %}
+{% for i in Questions %}
+<p> <b> Text Question : </b> {{ i.TextQuestion | upper }} </p>
+<p> <b> ResponseProp1 : </b> {{ i.ResponseProp1}} </p>
+<p> <b> ResponseProp2 : </b> {{ i.ResponseProp2 }} </p>
+<p> <b> ResponseProp3 : </b> {{ i.ResponseProp3 }} </p>
+
+<p> <b> ResponseCorrect : </b> {{ i.ResponseCorrect}} </p>
+<a href="{{path('app_question_edit',{id: i.idQuestion})}}">Edit<a/>
+<a href="{{path('app_question_remove',{id: i.idQuestion})}}">Delete<a/>
+
+<hr>
+{% else %}
+<p>Le Tableau est vide.</p>
+{% endfor %}
+
+
+</div>
+{% endblock %}
