@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event index{% endblock %}
+
+{% block body %}
+    <h1>Event index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id_e</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Lieu</th>
+                <th>Date_e</th>
+                <th>Organisation</th>
+                <th>Capacite</th>
+                <th>Nbplaces</th>
+                <th>Categorie</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for event in events %}
+            <tr>
+                <td>{{ event.getIdE() }}</td>
+                <td>{{ event.getTitre() }}</td>
+                <td>{{ event.getDescription() }}</td>
+                <td>{{ event.getLieu() }}</td>
+                <td>{{ event.getDateE() ? event.getDateE()|date('Y-m-d') : '' }}</td>
+                <td>{{ event.getOrganisation() }}</td>
+                <td>{{ event.getCapacite() }}</td>
+                <td>{{ event.getNbplaces() }}</td>
+                <td>{{ event.getCategorie() }}</td>
+                <td>
+                    <a href="{{ path('app_event_show', {'id_e': event.getIdE()}) }}">show</a>
+                    <a href="{{ path('app_event_edit', {'id_e': event.getIdE()}) }}">edit</a>
+                    {# Lien vers la création de la réservation pour cet événement #}
+                    <a href="{{ path('app_reservation_new', {'id_e': event.getIdE()}) }}">Create reservation</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_event_new') }}">Create new event</a>
+{% endblock %}
