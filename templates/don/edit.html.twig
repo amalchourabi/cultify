@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Modifier le don</h1>
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    
+    <div class="form-group">
+        {{ form_label(form.montant, 'Montant', {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        {{ form_widget(form.montant, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.montant) }} {# Affiche les messages d'erreur pour le montant #}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.association, 'Association', {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        {{ form_widget(form.association, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.association) }} {# Affiche les messages d'erreur pour l'association #}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Soumettre</button>
+    {{ form_end(form) }}
+{% endblock %}

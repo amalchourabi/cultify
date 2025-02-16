@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{# Dans le block javascripts #}
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3">Liste des associations ({{associations|length}})</h1>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#formAjout">
+                    Ajouter une association
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {# Tableau des associations #}
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table  table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Contact</th>
+                            <th>But</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for association in associations %}
+                        <tr>
+                            <td>{{ association.id }}</td>
+                            <td>{{ association.nom|upper }}</td>
+                            <td>{{ association.description }}</td>
+                            <td>{{ association.contact }}</td>
+                            <td>{{ association.but }}</td>
+                            {% if association.image %}
+                            <td>
+            <img src="{{ asset('uploads/images/' ~ association.image) }}" alt="{{ association.nom }}" width="200">
+        {% else %}
+            <td>Aucune image disponible</td>
+        {% endif %}
+        </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ path('app_association_edit', {'id': association.id }) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                    <a href="{{ path('app_association_delete', {'id': association.id }) }}" 
+                                       class="btn btn-sm btn-outline-danger" 
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette association ?')">
+                                        <i class="bi bi-trash"></i> Supprimer
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

@@ -1,0 +1,45 @@
+{# templates/user/simulate_user.html.twig #}
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Simuler un utilisateur</h1>
+
+        {# Afficher les messages flash #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {# Boutons pour simuler les utilisateurs #}
+        <div class="d-grid gap-3">
+            <a href="{{ path('app_simulate_user_donateur') }}" class="btn btn-primary btn-lg">
+                Simuler un donateur (ID: 1, Rôle: donateur)
+            </a>
+            <a href="{{ path('app_simulate_user_user') }}" class="btn btn-secondary btn-lg">
+                Simuler un utilisateur (ID: 2, Rôle: user)
+            </a>
+            <a href="{{ path('app_simulate_user_organisateur') }}" class="btn btn-warning btn-lg">
+                Simuler un organisateur (ID: 3, Rôle: organisateur)
+            </a>
+            <a href="{{ path('app_simulate_user_clear_session') }}" class="btn btn-danger btn-lg">
+                Vider la session
+            </a>
+        </div>
+
+        {# Afficher les informations de la session #}
+        <div class="mt-5">
+            <h2>Informations de la session</h2>
+            <p><strong>ID de l'utilisateur :</strong> {{ app.session.get('user_id') ?? 'Non défini' }}</p>
+            <p><strong>Rôle de l'utilisateur :</strong> {{ app.session.get('user_role') ?? 'Non défini' }}</p>
+        </div>
+        
+    </div>
+    {# Garder votre code existant et ajouter juste ceci à la fin #}
+<div class="mt-3">
+    <small class="text-muted">
+        Session ID: {{ app.session.id }}<br>
+        Données en session: {{ app.session.all|json_encode }}
+    </small>
+</div>
+{% endblock %}

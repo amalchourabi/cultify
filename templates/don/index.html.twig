@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Mes dons</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Association</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for don in dons %}
+            <tr>
+                <td>{{ don.association.nom }}</td>
+                <td>{{ don.montant }}</td>
+                <td>{{ don.status }}</td>
+                <td>
+                {% if don.status == 'en_attente' %}
+                    <a href="{{ path('app_don_edit', {'id': don.id }) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Modifier</a>
+                    <form method="post" action="{{ path('app_don_delete', {'id': don.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce don ?');">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                    
+                        <a href="{{ path('app_don_confirm', {'id': don.id}) }}" class="btn btn-success">Confirmer</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
