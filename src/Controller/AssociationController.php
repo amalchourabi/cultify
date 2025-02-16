@@ -122,11 +122,21 @@ final class AssociationController extends AbstractController
         return $this->redirectToRoute('app_affiche');
     }
     #[Route('/associations', name: 'app_affiche')]
-    public function afficheAssociation(AssociationRepository $repo) 
+    public function afficheAssociation(AssociationRepository $repo,UserRepository $userRepository,Request $request) 
     {
-        
+        $session = $request->getSession();
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
         $asociations=$repo->findAll();
+        if($user && $user->getRole() === 'admin')
+        {
         return $this->render('association/afficher.html.twig', [    'associations' => $asociations,]);
+        }else{
+            if ($user && $user->getRole() === 'organisateur') {
+                $userRepository->calculerContribution($user);
+            }
+            return $this->render('association/affiche_user.html.twig', [    'associations' => $asociations,'user'=>$user]);
+        }
     }
     #[Route('/associationsUser', name: 'app_afficher')]
     public function afficheAssociationUSer(AssociationRepository $repo,UserRepository $userRepository,Request $request) 

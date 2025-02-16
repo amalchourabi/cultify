@@ -7,7 +7,7 @@
         <div class="col">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h3">Liste des associations ({{associations|length}})</h1>
-                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#formAjout">
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" onclick="window.location.href='{{ path('app_association_add') }}'">
                     Ajouter une association
                 </button>
             </div>
