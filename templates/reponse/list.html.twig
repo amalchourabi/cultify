@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Réponses{% endblock %}
+
+{% block body %}
+<h1>Liste des Réponses</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Titre</th>
+            <th>Contenu</th>
+            <th>Offre</th>
+            <th>Réclamation associée</th>
+            <th>Pièce jointe</th>
+            <th>Actions</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        {% for reponse in reponses %}
+            <tr>
+                <td>{{ reponse.id }}</td>
+                <td>{{ reponse.dateReponse|date('d/m/Y') }}</td>
+                <td>{{ reponse.titre }}</td>
+                <td>{{ reponse.contenu }}</td>
+                <td>{{ reponse.offre }}</td>
+                <td>{{ reponse.reclamation.id }}</td>
+                <td>
+                {% if reponse.getPieceJointe() %}
+                    <a href="{{ asset('uploads/' ~ reponse.getPieceJointe()) }}" target="_blank">Voir la pièce jointe</a>
+                {% else %}
+                    Aucune
+                {% endif %}</td>
+
+            <td>
+                    <a href="{{ path('app_reponse_edit', {'id': reponse.id}) }}" class="btn btn-primary">Modifier</a>
+                    <a href="{{ path('app_reponse_delete', {'id': reponse.id}) }}" class="btn btn-danger">Supprimer</a>
+                </td>
+                
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">Aucune réponse trouvée.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ path('app_reponse_new') }}" class="btn btn-success">Ajouter une réponse</a>
+{% endblock %}

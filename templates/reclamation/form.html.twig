@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+<div class="container mt-4">
+    {% for error in form.vars.errors %}
+        <div class="alert alert-danger">{{ error.message }}</div>
+    {% endfor %}
+
+    
+    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+    
+    <div class="mb-3">
+        {{ form_label(form.type, 'Type de réclamation', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.type, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.type) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.titre, 'Titre', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': 'Entrez un titre'}}) }}
+        {{ form_errors(form.titre) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Décrivez votre réclamation...'}}) }}
+        {{ form_errors(form.description) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.email, 'Email (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Entrez votre email (facultatif)'}}) }}
+        {{ form_errors(form.email) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.priorite, 'Priorité', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.priorite, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.priorite) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.piece_jointe, 'Pièce jointe (optionnelle)', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.piece_jointe, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.piece_jointe) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<a href="{{ path('app_reclamation_list') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}La Liste des réclamations{% endblock %}
+
+{% block body %}
+<h1>La liste des réclamations</h1>
+
+<a href="{{ path('app_reclamation_new') }}" class="btn btn-primary mb-3">Ajouter nouvelle réclamation</a>
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Titre</th>
+            <th>Description</th>
+            <th>Email</th>
+            <th>Priorité</th>
+            <th>Pièce jointe</th>
+            <th>Statut</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for reclamation in reclamations %}
+        <tr>
+            <td>{{ reclamation.getId() }}</td>
+            <td>{{ reclamation.getType() }}</td>
+            <td>{{ reclamation.getTitre() }}</td>
+            <td>{{ reclamation.getDescription() }}</td>
+            <td>{{ reclamation.getEmail() is not empty ? reclamation.getEmail() : 'Non spécifié' }}</td>
+            <td>{{ reclamation.getPriorite() }}</td>
+            <td>
+                {% if reclamation.getPieceJointe() %}
+                    <a href="{{ asset('uploads/' ~ reclamation.getPieceJointe()) }}" target="_blank">Voir la pièce jointe</a>
+                {% else %}
+                    Aucune
+                {% endif %}
+            </td>
+            <td>{{ reclamation.getStatut() }}</td>
+            <td>
+                <a href="{{ path('app_reclamation_edit', { id: reclamation.getId() }) }}" class="btn btn-warning btn-sm">Modifier</a>
+                <form action="{{ path('app_reclamation_delete', { id: reclamation.getId() }) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.getId()) }}">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?');">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="9" class="text-center">Aucune réclamation n'a été trouvée.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
