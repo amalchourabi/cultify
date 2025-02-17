@@ -66,11 +66,12 @@ class AddEditContenuMultiMediaType extends AbstractType
             ])
             ->add('DateMedia', DateTimeType::class, [
                 'widget' => 'single_text',
+                'required' => true,
+                'data' => new \DateTime(),
                 'constraints' => [
-                    new Assert\NotNull(['message' => 'Veuillez choisir une date.']),
-                    new Assert\LessThanOrEqual([
-                        'value' => 'today',
-                        'message' => 'La date ne peut pas être dans le futur.',
+                    new Assert\NotNull([
+                        'message' => 'Veuillez choisir une date.',
+                        'groups' => ['Default'], // Gérer selon le contexte
                     ]),
                 ],
             ])

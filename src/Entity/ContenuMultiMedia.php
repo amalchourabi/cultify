@@ -32,8 +32,8 @@ class ContenuMultiMedia
     #[ORM\Column(length: 255)]
     private ?string $CategorieMedia = null;
 
-    #[ORM\Column(type: 'datetime')]
-private ?\DateTimeInterface $DateMedia = null;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+private ?\DateTime $DateMedia = null;
 
     /**
      * @var Collection<int, Quiz>
@@ -105,10 +105,9 @@ private ?\DateTimeInterface $DateMedia = null;
         return $this->DateMedia;
     }
 
-    public function setDateMedia(\DateTimeInterface $DateMedia): static
+    public function setDateMedia(?\DateTimeInterface $DateMedia): self
     {
         $this->DateMedia = $DateMedia;
-
         return $this;
     }
 

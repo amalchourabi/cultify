@@ -19,8 +19,8 @@ class Quiz
     #[ORM\Column(length: 255)]
     private ?string $TitreQuiz = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $DateQuiz = null;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTime $DateQuiz = null;
 
     #[ORM\Column]
     private ?int $ScoreQuiz = null;
@@ -65,16 +65,15 @@ class Quiz
     }
 
     public function getDateQuiz(): ?\DateTimeInterface
-    {
-        return $this->DateQuiz;
-    }
+{
+    return $this->DateQuiz;
+}
 
-    public function setDateQuiz(\DateTimeInterface $DateQuiz): static
-    {
-        $this->DateQuiz = $DateQuiz;
-
-        return $this;
-    }
+public function setDateQuiz(?\DateTimeInterface $DateQuiz): self
+{
+    $this->DateQuiz = $DateQuiz;
+    return $this;
+}
 
     public function getScoreQuiz(): ?int
     {

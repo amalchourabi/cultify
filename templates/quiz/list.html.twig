@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'basefrontoffice.html.twig' %}
 
 {% block title %}Hello QuizController!{% endblock %}
 
@@ -17,7 +17,7 @@
 <p> <b> ReponseChoisit : </b> {{ i.ReponseChoisit }} </p>
 <a href="{{path('app_quiz_edit',{id: i.idQuiz})}}">Edit<a/>
 <a href="{{path('app_quiz_remove',{id: i.idQuiz})}}">Delete<a/>
-
+<a href="{{path('app_question_new',{id: i.getIdQuiz()})}}">ajouter question<a/>
 <hr>
 {% else %}
 <p>Le Tableau est vide.</p>

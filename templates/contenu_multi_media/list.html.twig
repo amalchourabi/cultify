@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'basefrontoffice.html.twig' %}
 
 {% block title %}Hello jardinController!{% endblock %}
 
@@ -27,7 +27,7 @@
 
 <a href="{{path('app_contenu_multi_media_edit',{id: i.idContenu})}}">Edit<a/>
 <a href="{{path('app_contenu_multi_media_remove',{id: i.idContenu})}}">Delete<a/>
-
+<a href="{{path('app_quiz_new',{id: i.getIdContenu()})}}">ajouter quiz<a/>
 <hr>
 {% else %}
 <p>Le Tableau est vide.</p>
