@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 class ReservationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -20,22 +20,27 @@ class ReservationType extends AbstractType
             ])
             ->add('theme')
             ->add('url')
-            ->add('nbTickets', ChoiceType::class, [
-                'choices' => [
-                    '1 Ticket' => 1,
-                    '2 Tickets' => 2,
-                    '3 Tickets' => 3,
-                    '4 Tickets' => 4,
-                    '5 Tickets' => 5,
-                ],
-                'expanded' => false,  // Menu déroulant
-                'multiple' => false,  // Un seul choix possible
-            ])
+            ->add('nbTickets')
             ->add('id_e', HiddenType::class, [
                 'data' => $options['id_e'],  // Pré-rempli avec l'ID de l'événement
                 'mapped' => false,            // Non lié directement à l'entité
             ])
+            ->add('prix', NumberType::class, [
+                'label' => 'Prix',
+                'scale' => 2, // Nombre de décimales
+                'attr' => ['min' => 0], // Empêche les valeurs négatives
+            ])
+            ->add('etat', ChoiceType::class, [
+                'choices' => [
+                    'Confirmé' => 'confirmé',
+                    'Annulé' => 'annulé',
+                ],
+                'expanded' => true,  // Affiche sous forme de boutons radio
+                'multiple' => false, // Un seul choix possible
+                'label' => 'État de la réservation',
+            ])
            ;
+           
             
     }
 

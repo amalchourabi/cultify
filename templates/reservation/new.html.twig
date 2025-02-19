@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Créer une nouvelle réservation</h1>
 
-    {{ form_start(form, {'method': 'POST'}) }}
+    {{ form_start(form, {'method': 'POST', 'attr': {'novalidate': 'novalidate'}})}}
         {{ form_widget(form) }}
         <button class="btn">{{ button_label|default('Save') }}</button>
     {{ form_end(form) }}

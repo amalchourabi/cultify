@@ -35,6 +35,11 @@ class Reservation
     #[Assert\Positive(message: "Le nombre de tickets doit être un entier positif.")]
     private ?int $nb_tickets = null;
 
+    #[ORM\Column(type: 'float')]
+    #[Assert\NotBlank(message: "Le prix ne peut pas être vide.")]
+     #[Assert\Positive(message: "Le prix doit être un nombre positif.")]   
+      private ?float $prix = null;
+
     #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: "reservations")]
     #[ORM\JoinColumn(name: "id_e", referencedColumnName: "id_e", nullable: false)]
     #[Assert\NotNull(message: "Un événement doit être associé à la réservation.")]
@@ -111,6 +116,17 @@ class Reservation
     public function setNbTickets(int $nb_tickets): static
     {
         $this->nb_tickets = $nb_tickets;
+        return $this;
+    }
+
+    public function getPrix(): ?float
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(float $prix): static
+    {
+        $this->prix = $prix;
         return $this;
     }
 

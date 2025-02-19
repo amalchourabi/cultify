@@ -1,0 +1,39 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Réservations{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Liste des Réservations</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Événement</th>
+                    <th>Utilisateur</th>
+                    <th>Date de Réservation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.id }}</td>
+                        <td>{{ reservation.event.name }}</td>
+                        <td>{{ reservation.user.username }}</td>
+                        <td>{{ reservation.reservationDate|date('Y-m-d H:i:s') }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_reservation_edit', {'id': reservation.id}) }}" class="btn btn-warning">Modifier</a>
+                            <a href="{{ path('app_admin_reservation_delete', {'id': reservation.id}) }}" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">Aucune réservation trouvée</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
