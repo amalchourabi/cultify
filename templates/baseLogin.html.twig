@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Mon Site{% endblock %}</title>
+    
+    {# Lien vers les fichiers CSS #}
+    <link rel="stylesheet" href="{{ asset('Auth/css/my-login.css') }}">
+    {% block css %}{% endblock %} 
+</head>
+<body>
+    <div class="container">
+        {% block body %}{% endblock %}
+    </div>
+
+    {# Inclusion des fichiers JS #}
+    <script src="{{ asset('Auth/js/my-login.js') }}"></script>
+    {% block js %}{% endblock %}
+</body>
+</html>
