@@ -9,9 +9,13 @@ use App\Form\DonType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Id;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Psr\Log\LoggerInterface;
 
 final class DonController extends AbstractController
 {
@@ -143,11 +147,23 @@ public function delete(Request $request, EntityManagerInterface $entityManager, 
     return $this->redirectToRoute('app_don_index');
 }
 #[Route('/don/confirm/{id}', name: 'app_don_confirm')]
-public function confirm(Request $request, EntityManagerInterface $entityManager, Don $don): Response
-{
+public function confirm(
+    Request $request, 
+    EntityManagerInterface $entityManager, 
+    Don $don, 
+    MailerInterface $mailer,
+    LoggerInterface $logger
+): Response {
     // Récupérer l'utilisateur simulé depuis la session
     $session = $request->getSession();
     $userId = $session->get('user_id');
+
+    // Debug information
+    $logger->info('Tentative de confirmation de don', [
+        'donId' => $don->getId(),
+        'userId' => $userId,
+        'userEmail' => $don->getIdUser()->getEmail()
+    ]);
 
     // Vérifier que l'utilisateur est le propriétaire du don
     if ($don->getIdUser()->getId() !== $userId) {
@@ -155,11 +171,51 @@ public function confirm(Request $request, EntityManagerInterface $entityManager,
         return $this->redirectToRoute('app_don_index');
     }
 
-    // Confirmer le don
-    $don->setStatus('confirme');
-    $entityManager->flush();
+    try {
+        // Confirmer le don
+        $don->setStatus('confirme');
+        $entityManager->flush();
 
-    $this->addFlash('success', 'Le don a été confirmé avec succès.');
+        $userEmail = $don->getIdUser()->getEmail();
+        $logger->info('Préparation de l\'email', ['to' => $userEmail]);
+
+        // Préparer l'email
+        $email = (new Email())
+            ->from(new Address('no-reply@demomailtrap.com', 'Service des Dons'))
+            ->to($userEmail)
+            ->subject('Confirmation de votre don')
+            ->html(sprintf(
+                '<h1>Confirmation de don</h1>
+                <p>Bonjour,</p>
+                <p>Votre don de <strong>%.2f €</strong> pour l\'association <strong>%s</strong> a été confirmé.</p>
+                <p>Merci pour votre générosité !</p>
+                <p>Cordialement,<br>L\'équipe</p>',
+                $don->getMontant(),
+                $don->getAssociation()->getNom()
+            ));
+
+        // Debug avant envoi
+        $logger->info('Tentative d\'envoi d\'email', [
+            'from' => 'no-reply@demomailtrap.com',
+            'to' => $userEmail,
+            'subject' => 'Confirmation de votre don'
+        ]);
+
+        // Envoyer l'email
+        $mailer->send($email);
+        
+        $logger->info('Email envoyé avec succès');
+        $this->addFlash('success', 'Le don a été confirmé et un email de confirmation a été envoyé.');
+
+    } catch (\Exception $e) {
+        $logger->error('Erreur lors de l\'envoi de l\'email', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        $this->addFlash('warning', 'Le don a été confirmé mais l\'envoi de l\'email a échoué. Erreur: ' . $e->getMessage());
+    }
+
     return $this->redirectToRoute('app_don_index');
 }
 }

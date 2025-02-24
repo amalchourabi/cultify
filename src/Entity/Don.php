@@ -30,10 +30,11 @@ class Don
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'dons')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")] // Modifié ici
     private ?User $idUser = null;
 
     #[ORM\ManyToOne(inversedBy: 'IdDon')]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")] // Modifié ici
     #[Assert\NotNull(message: "L'association ne peut pas être vide.")]
     private ?Association $association = null;
 

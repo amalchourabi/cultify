@@ -6,13 +6,13 @@ use App\Repository\UserRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Association;
-use App\Form\AddEditAssociationsType as AddUpdate;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use App\Form\AddEditAssociationsType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\AssociationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class AssociationController extends AbstractController
 {
@@ -23,134 +23,201 @@ final class AssociationController extends AbstractController
             'controller_name' => 'AssociationController',
         ]);
     }
+
     #[Route('/association/add', name: 'app_association_add')]
-    public function addAssociation(Request $req,EntityManagerInterface $em){
-        
-    
-        $association = new Association();
-        $form = $this->createForm(AddUpdate::class, $association);
+public function addAssociation(Request $req, EntityManagerInterface $em): Response
+{
+    $association = new Association();
+    $form = $this->createForm(AddEditAssociationsType::class, $association);
+    $form->handleRequest($req);
 
-        $form->handleRequest($req);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $imageFile = $form->get('image')->getData();
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($imageFile) {
+            $mimeType = $imageFile->getMimeType();
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
-            $imageFile = $form->get('image')->getData();
+            if (!in_array($mimeType, $allowedTypes)) {
+                $this->addFlash('error', 'Le fichier doit être une image (JPEG, PNG ou GIF)');
+                return $this->redirectToRoute('app_association_add');
+            }
 
-            if ($imageFile) {
-                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
 
-                // Déplacez le fichier dans le répertoire où les images sont stockées
+            try {
+                // Déplacez le fichier vers le répertoire de téléchargement
                 $imageFile->move(
                     $this->getParameter('images_directory'),
                     $newFilename
                 );
 
-                // Mettez à jour le champ image de l'entité Association
+                // Enregistrez le nom du fichier dans l'entité
                 $association->setImage($newFilename);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image');
+                return $this->redirectToRoute('app_association_add');
             }
-            $em->persist($association);
-            $em->flush();
-
-            $this->addFlash('success', 'L\'association a été ajoutée avec succès.');
-
-            return $this->redirectToRoute('app_affiche');
         }
 
-        return $this->render('association/add.html.twig', [
-            'form' => $form->createView(),
-            'title' => 'Ajouter une association',
-        ]);
+        $em->persist($association);
+        $em->flush();
 
+        $this->addFlash('success', 'L\'association a été ajoutée avec succès.');
+        return $this->redirectToRoute('app_affiche');
     }
-    #[Route('/association/edit/{id}', name: 'app_association_edit')]
-    public function editAssociation($id,Request $req,EntityManagerInterface $em,AssociationRepository $repo){
-        $association=$repo->find($id);
-        if(!$association){
-            throw $this->createNotFoundException('Association non trouvée');
-        }
-        $form=$this->createForm(AddUpdate::class,$association);
-        
-        $form->handleRequest($req);
-        if($form->isSubmitted()&&$form->isValid())
-        {
-            $imageFile = $form->get('image')->getData();
-            if ($imageFile) {
-                $newFilename = uniqid().'.'.$imageFile->guessExtension();
-    
-                // Déplacez le fichier dans le répertoire où les images sont stockées
+
+    return $this->render('association/add.html.twig', [
+        'form' => $form->createView(),
+        'title' => 'Ajouter une association',
+    ]);
+}
+
+#[Route('/association/edit/{id}', name: 'app_association_edit')]
+public function editAssociation($id, Request $req, EntityManagerInterface $em, AssociationRepository $repo): Response
+{
+    $association = $repo->find($id);
+    if (!$association) {
+        throw $this->createNotFoundException('Association non trouvée');
+    }
+
+    // Sauvegardez l'ancien nom de fichier
+    $oldImageFilename = $association->getImage();
+
+    $form = $this->createForm(AddEditAssociationsType::class, $association);
+    $form->handleRequest($req);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $imageFile = $form->get('image')->getData();
+
+        // Si un nouveau fichier est téléchargé
+        if ($imageFile) {
+            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+
+            try {
+                // Déplacez le nouveau fichier vers le répertoire de téléchargement
                 $imageFile->move(
                     $this->getParameter('images_directory'),
                     $newFilename
                 );
-    
-                // Mettez à jour le champ image de l'entité Association
-                $association->setImage($newFilename);
-            }
-            $em->flush();
-            $this->addFlash('success', 'L\'association a été modifiée avec succès.');
-            return $this->redirectToRoute('app_affiche');
-        }
-        return $this->render('association/edit.html.twig',[
-            'form'=>$form->createView(),
-            'association'=>$association
-        ]);
 
+                // Supprimez l'ancien fichier s'il existe
+                if ($oldImageFilename) {
+                    $oldImagePath = $this->getParameter('images_directory') . '/' . $oldImageFilename;
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
+                }
+
+                // Enregistrez le nouveau nom de fichier dans l'entité
+                $association->setImage($newFilename);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image');
+                return $this->redirectToRoute('app_association_edit', ['id' => $id]);
+            }
+        }
+
+        $em->flush();
+        $this->addFlash('success', 'L\'association a été modifiée avec succès.');
+        return $this->redirectToRoute('app_affiche');
     }
+
+    return $this->render('association/edit.html.twig', [
+        'form' => $form->createView(),
+        'association' => $association,
+    ]);
+}
+
     #[Route('/association/delete/{id}', name: 'app_association_delete')]
-    public function deleteAssociation($id, EntityManagerInterface $em, AssociationRepository $repo, Filesystem $filesystem)
+    public function deleteAssociation($id, EntityManagerInterface $em, AssociationRepository $repo, Filesystem $filesystem): Response
     {
-        // Récupérer l'association
         $association = $repo->find($id);
         if (!$association) {
             throw $this->createNotFoundException('Association non trouvée');
         }
 
-         // Supprimer l'image associée si elle existe
-        $imageFilename = $association->getImage(); // Assurez-vous que cette méthode existe dans votre entité
+        $imageFilename = $association->getImage();
         if ($imageFilename) {
             $imagePath = $this->getParameter('images_directory') . '/' . $imageFilename;
             if ($filesystem->exists($imagePath)) {
-                $filesystem->remove($imagePath); // Supprime le fichier image
+                $filesystem->remove($imagePath);
             }
         }
 
-        // Supprimer l'association de la base de données
         $em->remove($association);
         $em->flush();
 
-        // Rediriger vers la liste des associations
         return $this->redirectToRoute('app_affiche');
     }
+
     #[Route('/associations', name: 'app_affiche')]
-    public function afficheAssociation(AssociationRepository $repo,UserRepository $userRepository,Request $request) 
+    public function afficheAssociation(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
     {
         $session = $request->getSession();
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
-        $asociations=$repo->findAll();
-        if($user && $user->getRole() === 'admin')
-        {
-        return $this->render('association/afficher.html.twig', [    'associations' => $asociations,]);
-        }else{
+        $searchTerm = $request->query->get('search', '');
+    
+        // Filtrer les associations en fonction du terme de recherche
+        $associations = $repo->findBySearchTerm($searchTerm);
+    
+        if ($user && $user->getRole() === 'admin') {
+            return $this->render('association/afficher.html.twig', [
+                'associations' => $associations,
+                'searchTerm' => $searchTerm,
+            ]);
+        } else {
             if ($user && $user->getRole() === 'organisateur') {
                 $userRepository->calculerContribution($user);
             }
-            return $this->render('association/affiche_user.html.twig', [    'associations' => $asociations,'user'=>$user]);
+            return $this->render('association/affiche_user.html.twig', [
+                'associations' => $associations,
+                'user' => $user,
+                'searchTerm' => $searchTerm,
+            ]);
         }
     }
+    #[Route('/associations/search', name: 'app_association_search', methods: ['GET'])]
+    public function searchAssociations(Request $request, AssociationRepository $repo): JsonResponse
+    {
+        $searchTerm = $request->query->get('search', '');
+        $associations = $repo->findBySearchTerm($searchTerm);
+    
+        // Formater les résultats pour JSON
+        $results = [];
+        foreach ($associations as $association) {
+            $results[] = [
+                'id' => $association->getId(),
+                'nom' => $association->getNom(),
+                'description' => $association->getDescription(),
+                'contact' => $association->getContact(),
+                'but' => $association->getBut(),
+                'image' => $association->getImage(),
+                'montantDesire' => $association->getMontantDesire(),
+                'pourcentageProgression' => $association->getPourcentageProgression(),
+            ];
+        }
+    
+        return new JsonResponse($results);
+    }
+
     #[Route('/associationsUser', name: 'app_afficher')]
-    public function afficheAssociationUSer(AssociationRepository $repo,UserRepository $userRepository,Request $request) 
+    public function afficheAssociationUSer(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
     {
         $session = $request->getSession();
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
 
-        // Si l'utilisateur est un organisateur, calculer sa contribution
         if ($user && $user->getRole() === 'organisateur') {
             $userRepository->calculerContribution($user);
         }
-        $asociations=$repo->findAll();
-        return $this->render('association/affiche_user.html.twig', [    'associations' => $asociations,'user'=>$user]);
-    }
-}
 
+        $associations = $repo->findAll();
+        return $this->render('association/affiche_user.html.twig', [
+            'associations' => $associations,
+            'user' => $user
+        ]);
+    }
+   
+    
+}

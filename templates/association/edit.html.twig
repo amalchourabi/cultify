@@ -68,13 +68,24 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                        {{ form_label(form.image, 'Image', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                                        <div class="form-group row">
+                        {{ form_label(form.montantDesire, 'montantDesire', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
                         <div class="col-sm-9">
-                            {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.image) }}
+                            {{ form_widget(form.montantDesire, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.montantDesire) }}
                         </div>
                     </div>
+
+                   <div class="form-group row">
+    {{ form_label(form.image, 'Image', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+    <div class="col-sm-9">
+        {% if association.image %}
+            <img src="{{ asset('uploads/images/' ~ association.image) }}" alt="Image actuelle" style="max-width: 100px; margin-bottom: 10px;">
+        {% endif %}
+        {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.image) }}
+    </div>
+</div>
 
                     <div class="form-group row">
                         <div class="col-sm-12 text-center"> {# Centrer le bouton #}

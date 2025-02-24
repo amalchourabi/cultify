@@ -26,13 +26,16 @@ class Association
     )]
     private ?string $nom = null;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Assert\NotBlank(message: "Le montant du don ne peut pas être vide.")]
+    #[Assert\Positive(message: "Le montant du don doit être un nombre positif.")]
+    #[Assert\Type(type: 'numeric', message: "Le montant doit être un nombre.")]
+    private ?float $montantDesire = null;
+
+
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Image(
-        maxSize: '2M',
-        mimeTypes: ['image/jpeg', 'image/png', 'image/gif'],
-        mimeTypesMessage: 'Veuillez télécharger une image valide (JPEG, PNG, GIF).'
-    )]
     private ?string $image = null;
+
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: "La description ne peut pas être vide.")]
@@ -58,7 +61,7 @@ class Association
     /**
      * @var Collection<int, Don>
      */
-    #[ORM\OneToMany(targetEntity: Don::class, mappedBy: 'association')]
+    #[ORM\OneToMany(targetEntity: Don::class, mappedBy: 'association', cascade: ['remove'])]
     private Collection $IdDon;
 
     public function __construct()
@@ -106,6 +109,35 @@ class Association
 
         return $this;
     }
+    public function getMontantDesire(): ?float
+    {
+        return $this->montantDesire;
+    }
+
+    public function setMontantDesire(?float $montantDesire): static
+    {
+        $this->montantDesire = $montantDesire;
+        return $this;
+    }
+
+    public function getMontantActuel(): float
+    {
+        $montantTotal = 0;
+        foreach ($this->IdDon as $don) {
+            if ($don->getStatus() === 'confirme') {
+                $montantTotal += $don->getMontant();
+            }
+        }
+        return $montantTotal;
+    }
+
+    public function getPourcentageProgression(): float
+    {
+        if ($this->montantDesire <= 0) {
+            return 0;
+        }
+        return min(100, ($this->getMontantActuel() / $this->montantDesire) * 100);
+    }
 
     public function getBut(): ?string
     {
@@ -122,11 +154,10 @@ class Association
     {
         return $this->image;
     }
-
+    
     public function setImage(?string $image): static
     {
         $this->image = $image;
-
         return $this;
     }
 

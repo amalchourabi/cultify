@@ -1,12 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{# Dans le block javascripts #}
 {% block body %}
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col">
             <div class="d-flex justify-content-between align-items-center">
-                <h1 class="h3">Liste des associations ({{associations|length}})</h1>
+                <h1 class="h3">Liste des associations ({{ associations|length }})</h1>
                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse" onclick="window.location.href='{{ path('app_association_add') }}'">
                     Ajouter une association
                 </button>
@@ -14,11 +13,23 @@
         </div>
     </div>
 
+    {# Barre de recherche #}
+    <div class="row mb-4">
+        <div class="col">
+            <form action="{{ path('app_affiche') }}" method="get">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Rechercher une association..." name="search" value="{{ searchTerm }}">
+                    <button class="btn btn-outline-secondary" type="submit">Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {# Tableau des associations #}
     <div class="card mb-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table  table-hover">
+                <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
@@ -26,6 +37,7 @@
                             <th>Description</th>
                             <th>Contact</th>
                             <th>But</th>
+                            <th>Montant desire</th>
                             <th>Image</th>
                             <th>Action</th>
                         </tr>
@@ -38,22 +50,20 @@
                             <td>{{ association.description }}</td>
                             <td>{{ association.contact }}</td>
                             <td>{{ association.but }}</td>
-                            {% if association.image %}
+                            <td>{{ association.montantDesire }}</td>
                             <td>
-            <img src="{{ asset('uploads/images/' ~ association.image) }}" alt="{{ association.nom }}" width="200">
-        {% else %}
-            <td>Aucune image disponible</td>
-        {% endif %}
-        </td>
+                                {% if association.image %}
+                                    <img src="{{ asset('uploads/images/' ~ association.image) }}" alt="{{ association.nom }}" width="200">
+                                {% else %}
+                                    Aucune image disponible
+                                {% endif %}
+                            </td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    <a href="{{ path('app_association_edit', {'id': association.id }) }}" 
-                                       class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ path('app_association_edit', {'id': association.id }) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Modifier
                                     </a>
-                                    <a href="{{ path('app_association_delete', {'id': association.id }) }}" 
-                                       class="btn btn-sm btn-outline-danger" 
-                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette association ?')">
+                                    <a href="{{ path('app_association_delete', {'id': association.id }) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette association ?')">
                                         <i class="bi bi-trash"></i> Supprimer
                                     </a>
                                 </div>
@@ -65,4 +75,10 @@
             </div>
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}
+
+{% block js %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

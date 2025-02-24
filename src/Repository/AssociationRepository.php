@@ -40,4 +40,17 @@ class AssociationRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findBySearchTerm(string $searchTerm): array
+    {
+        $query = $this->createQueryBuilder('a')
+            ->andWhere('a.nom LIKE :searchTerm')
+            ->setParameter('searchTerm', $searchTerm . '%')
+            ->getQuery();
+    
+        // Log la requête SQL générée
+        $query->getSQL();
+        $query->getParameters();
+    
+        return $query->getResult();
+    }
 }
