@@ -15,7 +15,10 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\PdfGenerator;
 use Psr\Log\LoggerInterface;
+use BaconQrCode\Renderer\Image\Png;
+use BaconQrCode\Writer;
 
 final class DonController extends AbstractController
 {
@@ -152,18 +155,12 @@ public function confirm(
     EntityManagerInterface $entityManager, 
     Don $don, 
     MailerInterface $mailer,
-    LoggerInterface $logger
+    LoggerInterface $logger,
+    PdfGenerator $pdfGenerator
 ): Response {
     // Récupérer l'utilisateur simulé depuis la session
     $session = $request->getSession();
     $userId = $session->get('user_id');
-
-    // Debug information
-    $logger->info('Tentative de confirmation de don', [
-        'donId' => $don->getId(),
-        'userId' => $userId,
-        'userEmail' => $don->getIdUser()->getEmail()
-    ]);
 
     // Vérifier que l'utilisateur est le propriétaire du don
     if ($don->getIdUser()->getId() !== $userId) {
@@ -175,11 +172,30 @@ public function confirm(
         // Confirmer le don
         $don->setStatus('confirme');
         $entityManager->flush();
+        
+        
 
+        // Générer le PDF
+        $html = $this->renderView('don/pdf_template.html.twig', [
+            'don' => $don,
+        ]);
+        
+        $filename = 'don_confirmation_' . $don->getId() . '.pdf';
+        $filePath = $pdfGenerator->generatePdf($html, $filename);
+        
+        
+        // Vérifier que le fichier existe
+        
+
+        // Vérifier la taille du fichier PDF
+        $fileSize = filesize($filePath);
+        
+
+        // Envoyer un email de confirmation avec le PDF en pièce jointe
         $userEmail = $don->getIdUser()->getEmail();
-        $logger->info('Préparation de l\'email', ['to' => $userEmail]);
-
-        // Préparer l'email
+        
+        $logger->info('Préparation de l\'email pour: ' . $userEmail);
+        
         $email = (new Email())
             ->from(new Address('no-reply@demomailtrap.com', 'Service des Dons'))
             ->to($userEmail)
@@ -193,29 +209,42 @@ public function confirm(
                 $don->getMontant(),
                 $don->getAssociation()->getNom()
             ));
-
-        // Debug avant envoi
-        $logger->info('Tentative d\'envoi d\'email', [
-            'from' => 'no-reply@demomailtrap.com',
-            'to' => $userEmail,
-            'subject' => 'Confirmation de votre don'
-        ]);
-
-        // Envoyer l'email
+            
+        // Lire le contenu du PDF
+        $pdfContent = file_get_contents($filePath);
+       
+        
+        // Attacher le PDF directement depuis le contenu binaire
+        $email->attach($pdfContent, $filename, 'application/pdf');
+       
         $mailer->send($email);
         
-        $logger->info('Email envoyé avec succès');
-        $this->addFlash('success', 'Le don a été confirmé et un email de confirmation a été envoyé.');
+
+        // Supprimer le fichier temporaire après l'envoi
+        if (file_exists($filePath)) {
+            unlink($filePath);
+            
+        }
+
+        $this->addFlash('success', 'Le don a été confirmé et un email de confirmation a été envoyé avec le PDF.');
+        return $this->redirectToRoute('app_don_index');
 
     } catch (\Exception $e) {
-        $logger->error('Erreur lors de l\'envoi de l\'email', [
+        $logger->error('Erreur lors de la confirmation du don', [
+            'don_id' => $don->getId(),
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString()
         ]);
         
+        // Mettre quand même le don en statut confirmé si l'erreur est survenue après
+        if ($don->getStatus() !== 'confirme') {
+            $don->setStatus('confirme');
+            $entityManager->flush();
+            
+        }
+        
         $this->addFlash('warning', 'Le don a été confirmé mais l\'envoi de l\'email a échoué. Erreur: ' . $e->getMessage());
+        return $this->redirectToRoute('app_don_index');
     }
-
-    return $this->redirectToRoute('app_don_index');
 }
 }
