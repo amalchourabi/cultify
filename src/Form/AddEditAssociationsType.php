@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType; 
 use Symfony\Component\Form\Extension\Core\Type\NumberType; 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 class AddEditAssociationsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -48,6 +51,18 @@ class AddEditAssociationsType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('siteWeb', UrlType::class, [
+                'label' => 'Site Web',
+                'required' => false, // Le champ est optionnel
+                'attr' => [
+                    'placeholder' => 'https://example.com',
+                ],
+            ])
+            ->add('captcha', Recaptcha3Type::class, [
+                'constraints' => new Recaptcha3(),
+                'action_name' => 'don',
+                
+            ]);
         ;
     }
 

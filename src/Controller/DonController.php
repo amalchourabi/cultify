@@ -17,33 +17,42 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\PdfGenerator;
 use Psr\Log\LoggerInterface;
-use BaconQrCode\Renderer\Image\Png;
-use BaconQrCode\Writer;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3Validator;
 
 final class DonController extends AbstractController
 {
     #[Route('/don', name: 'app_don_index')]
-public function index(Request $request, EntityManagerInterface $entityManager): Response
-{
-    // Récupérer l'utilisateur simulé depuis la session
-    $session = $request->getSession();
-    $userId = $session->get('user_id');
-
-    if (!$userId) {
-        $this->addFlash('error', 'Vous devez être connecté pour voir vos dons.');
-        return $this->redirectToRoute('app_simulate_user');
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Get the user from the session
+        $session = $request->getSession();
+        $userId = $session->get('user_id');
+    
+        if (!$userId) {
+            $this->addFlash('error', 'Vous devez être connecté pour voir vos dons.');
+            return $this->redirectToRoute('app_simulate_user');
+        }
+    
+        // Fetch dons from the database
+        $dons = $entityManager->getRepository(Don::class)->findBy(['idUser' => $userId]);
+    
+        // Get the reCAPTCHA site key from the container
+        $recaptchaSiteKey = $this->getParameter('recaptcha_site_key');
+    
+        return $this->render('don/index.html.twig', [
+            'dons' => $dons,
+            'recaptcha_site_key' => $recaptchaSiteKey,
+        ]);
     }
-
-    // Récupérer les dons de l'utilisateur
-    $dons = $entityManager->getRepository(Don::class)->findBy(['idUser' => $userId]);
-
-    return $this->render('don/index.html.twig', [
-        'dons' => $dons,
-    ]);
-}
 #[Route('/don/new/{id}', name: 'app_don_new')]
-public function new(Request $request,EntityManagerInterface $entityManager,AssociationRepository $associationRepository,UserRepository $userRepository, int $id): Response 
-{
+public function new(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    AssociationRepository $associationRepository,
+    UserRepository $userRepository,
+    int $id,
+    Recaptcha3Validator $recaptcha3Validator
+): Response {
     // Récupérer l'association sélectionnée
     $association = $associationRepository->find($id);
     if (!$association) {
@@ -71,11 +80,11 @@ public function new(Request $request,EntityManagerInterface $entityManager,Assoc
     $don = new Don();
     $don->setAssociation($association);
     $don->setStatus('en_attente');
-    $don->setIdUser($user); // Utiliser l'objet User
-    $don->setDonorType($userRole); // Définir le donorType à partir du user_role
-    if($user->getRole()=="organisateur"&&$user->getMontantAPayer()>0){
+    $don->setIdUser($user);
+    $don->setDonorType($userRole);
+    if ($user->getRole() == "organisateur" && $user->getMontantAPayer() > 0) {
         $don->setType("contribution");
-    }else{
+    } else {
         $don->setType("don");
     }
 
@@ -84,6 +93,13 @@ public function new(Request $request,EntityManagerInterface $entityManager,Assoc
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+        // Validate reCAPTCHA
+        $recaptchaError = $recaptcha3Validator->getLastResponse()->getErrorCodes();
+        if (!empty($recaptchaError)) {
+            $this->addFlash('error', 'Veuillez compléter le reCAPTCHA.');
+            return $this->redirectToRoute('app_don_new', ['id' => $id]);
+        }
+
         $entityManager->persist($don);
         $entityManager->flush();
 
@@ -156,12 +172,13 @@ public function confirm(
     Don $don, 
     MailerInterface $mailer,
     LoggerInterface $logger,
-    PdfGenerator $pdfGenerator
+    PdfGenerator $pdfGenerator,
+    Recaptcha3Validator $recaptcha3Validator
 ): Response {
     // Récupérer l'utilisateur simulé depuis la session
     $session = $request->getSession();
     $userId = $session->get('user_id');
-
+   
     // Vérifier que l'utilisateur est le propriétaire du don
     if ($don->getIdUser()->getId() !== $userId) {
         $this->addFlash('error', 'Vous n\'êtes pas autorisé à confirmer ce don.');
@@ -197,7 +214,7 @@ public function confirm(
         $logger->info('Préparation de l\'email pour: ' . $userEmail);
         
         $email = (new Email())
-            ->from(new Address('no-reply@demomailtrap.com', 'Service des Dons'))
+            ->from(new Address('no-reply@demomailtrap.co', 'Service des Dons'))
             ->to($userEmail)
             ->subject('Confirmation de votre don')
             ->html(sprintf(

@@ -14,8 +14,10 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          overflow: hidden;
+          overflow: visible;
           transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+          margin-bottom: 20px;
+          cursor: pointer; /* Ajoute un curseur pointeur pour indiquer que c'est cliquable */
         }
 
         .card-image {
@@ -28,6 +30,7 @@
           background-position: center;
           background-repeat: no-repeat;
           z-index: 1;
+          border-radius: 10px;
         }
 
         .card svg {
@@ -37,47 +40,141 @@
         }
 
         .card:hover {
-          transform: rotate(-5deg) scale(1.1);
+          transform: rotate(-5deg) scale(1.05);
           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+          z-index: 100;
         }
 
         .card__content {
           position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%) rotate(-45deg);
+          top: 0;
+          left: 0;
           width: 100%;
-          height: 100%;
-          padding: 20px;
+          height: 100%; /* Même taille que l'image */
+          padding: 10px;
           box-sizing: border-box;
           background-color: #fff;
           opacity: 0;
+          transform: rotate(-45deg);
           transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
           z-index: 2;
+          border-radius: 10px;
+          max-height: 200px; /* Même hauteur que la carte */
+          overflow-y: auto; /* Permet de scroller */
         }
 
         .card:hover .card__content {
-          transform: translate(-50%, -50%) rotate(0deg);
+          transform: rotate(0deg);
           opacity: 1;
+          overflow-y: auto;
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Masquer la barre de progression quand on survole la carte */
+        .card:hover .progress-container {
+          display: none;
         }
 
         .card__title {
-          margin: 0;
-          font-size: 24px;
+          margin: 0 0 5px 0;
+          font-size: 16px;
           color: #333;
           font-weight: 700;
+          text-align: center;
+          border-bottom: 1px solid #eee;
+          padding-bottom: 5px;
         }
 
         .card__description {
-          margin: 10px 0 0;
-          font-size: 14px;
+          margin: 5px 0;
+          font-size: 11px;
           color: #777;
-          line-height: 1.4;
+          line-height: 1.2;
+        }
+
+        .card__description p {
+          margin-bottom: 4px;
+        }
+        
+        .card__description strong {
+          font-size: 11px;
         }
 
         .card:hover svg {
           scale: 0;
           transform: rotate(-45deg);
+        }
+        
+        /* QR code plus petit */
+        .qr-code-container {
+          text-align: center;
+          margin: 3px 0;
+        }
+        
+        .qr-code-container img {
+          width: 35px;
+          height: auto;
+        }
+        
+        /* Style pour les liens */
+        .card__description a {
+          font-size: 10px;
+          word-break: break-all;
+        }
+        
+        /* Barre de progression sur la photo uniquement (et transparente) */
+        .progress-container {
+          position: absolute;
+          bottom: 10px;
+          left: 10px;
+          right: 10px;
+          z-index: 3;
+        }
+        
+        .progress {
+          height: 10px !important;
+          background-color: rgba(255, 255, 255, 0.3) !important; /* Plus transparent */
+        }
+        
+        /* Couleurs pour les différents niveaux de progression */
+        .progress-bar-danger {
+          background-color: rgba(220, 53, 69, 0.7) !important; /* Rouge pour 0-25% */
+        }
+        
+        .progress-bar-warning {
+          background-color: rgba(255, 193, 7, 0.7) !important; /* Jaune pour 25-50% */
+        }
+        
+        .progress-bar-info {
+          background-color: rgba(13, 202, 240, 0.7) !important; /* Bleu clair pour 50-75% */
+        }
+        
+        .progress-bar-success {
+          background-color: rgba(25, 135, 84, 0.7) !important; /* Vert pour 75-100% */
+        }
+        
+        /* Pour s'assurer que tout est affiché quand on survole */
+        #associationsContainer .col-md-4 {
+          overflow: visible;
+        }
+
+        /* Style pour la barre de défilement */
+        .card__content::-webkit-scrollbar {
+          width: 5px;
+        }
+        
+        .card__content::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        
+        .card__content::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 10px;
+        }
+        
+        .card__content::-webkit-scrollbar-thumb:hover {
+          background: #555;
         }
     </style>
 {% endblock %}
@@ -106,9 +203,10 @@
     </div>
 
     {# Conteneur pour les résultats #}
-    <div class="row" id="associationsContainer">
-        {% for association in associations %}
-        <div class="col-md-4 mb-4">
+<div class="row" id="associationsContainer">
+    {% for association in associations %}
+    <div class="col-md-4 mb-4">
+        <a href="{{ path('app_don_new', {'id': association.id}) }}" style="text-decoration: none;">
             <div class="card">
                 {% if association.image %}
                     <div class="card-image" style="background-image: url('{{ asset('uploads/images/' ~ association.image) }}');"></div>
@@ -119,30 +217,47 @@
                         </svg>
                     </div>
                 {% endif %}
-                <div class="card__content">
-                    <p class="card__title">{{ association.nom|upper }}</p>
-                    <p class="card__description">
-                        <strong>Description :</strong> {{ association.description }}<br>
-                        <strong>Contact :</strong> {{ association.contact }}<br>
-                        <strong>But :</strong> {{ association.but }}<br>
-                        <strong>Objectif :</strong> {{ association.montantDesire|number_format(2, ',', ' ') }} TND<br>
-                    </p>
-                    <div class="progress mb-2" style="height: 20px;">
-                        <div class="progress-bar" 
+                
+                {# Barre de progression visible uniquement sur la photo avec couleurs selon pourcentage #}
+                <div class="progress-container">
+                    <div class="progress">
+                        {% set progression = association.pourcentageProgression %}
+                        {% set progressClass = 
+                            progression <= 25 ? 'progress-bar-danger' : 
+                            progression <= 50 ? 'progress-bar-warning' : 
+                            progression <= 75 ? 'progress-bar-info' : 
+                            'progress-bar-success' 
+                        %}
+                        <div class="progress-bar {{ progressClass }}" 
                              role="progressbar" 
-                             style="width: {{ association.pourcentageProgression }}%;" 
-                             aria-valuenow="{{ association.pourcentageProgression }}" 
+                             style="width: {{ progression }}%;" 
+                             aria-valuenow="{{ progression }}" 
                              aria-valuemin="0" 
                              aria-valuemax="100">
-                            {{ association.pourcentageProgression|number_format(1) }}%
+                            {{ progression|number_format(1) }}%
                         </div>
                     </div>
-                    <a href="{{ path('app_don_new', {'id': association.id}) }}" class="btn btn-primary">Faire un don</a>
+                </div>
+                
+                <div class="card__content" onclick="event.stopPropagation()">
+                    <p class="card__title">{{ association.nom|upper }}</p>
+                    <div class="card__description">
+                        <p><strong>Description :</strong> {{ association.description }}</p>
+                        <p><strong>Contact :</strong> {{ association.contact }}</p>
+                        <p><strong>But :</strong> {{ association.but }}</p>
+                        <p><strong>Objectif :</strong> {{ association.montantDesire|number_format(2, ',', ' ') }} TND</p>
+                        {% if association.siteWeb %}
+                            <div class="qr-code-container">
+                                <img src="{{ path('app_association_qrcode', {'id': association.id}) }}" alt="QR Code">
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
+        </a>
     </div>
+    {% endfor %}
+</div>
 </div>
 {% endblock %}
 
@@ -159,38 +274,66 @@
             container.innerHTML = ''; // Effacer les résultats précédents
 
             data.forEach(association => {
+                // Déterminer la classe de couleur en fonction du pourcentage
+                const progression = association.pourcentageProgression || 0;
+                let progressClass = '';
+                if (progression <= 25) {
+                    progressClass = 'progress-bar-danger';
+                } else if (progression <= 50) {
+                    progressClass = 'progress-bar-warning';
+                } else if (progression <= 75) {
+                    progressClass = 'progress-bar-info';
+                } else {
+                    progressClass = 'progress-bar-success';
+                }
+
+                // Construire le chemin vers l'image en utilisant le même format que dans Twig
+                const qrCodeHtml = association.siteWeb ? 
+                    `<div class="qr-code-container">
+                        <img src="${association.qrCodeUrl}" alt="QR Code">
+                    </div>` : '';
+
+                const imageUrl = association.image ? 
+                    `/uploads/images/${association.image}` : '';
+
                 const card = `
                     <div class="col-md-4 mb-4">
-                        <div class="card">
-                            ${association.image ?
-                                `<div class="card-image" style="background-image: url('{{ asset('uploads/images/') }}${association.image}');"></div>` :
-                                `<div class="card-image">
-                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M20 5H4V19L13.2923 9.70649C13.6828 9.31595 14.3159 9.31591 14.7065 9.70641L20 15.0104V5ZM2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"></path>
-                                    </svg>
-                                </div>`
-                            }
-                            <div class="card__content">
-                                <p class="card__title">${association.nom.toUpperCase()}</p>
-                                <p class="card__description">
-                                    <strong>Description :</strong> ${association.description}<br>
-                                    <strong>Contact :</strong> ${association.contact}<br>
-                                    <strong>But :</strong> ${association.but}<br>
-                                    <strong>Objectif :</strong> ${association.montantDesire ?? 'N/A'} TND<br>
-                                </p>
-                                <div class="progress mb-2" style="height: 20px;">
-                                    <div class="progress-bar" 
-                                         role="progressbar" 
-                                         style="width: ${association.pourcentageProgression ?? 0}%;" 
-                                         aria-valuenow="${association.pourcentageProgression ?? 0}" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="100">
-                                        ${association.pourcentageProgression?.toFixed(1) ?? 0}%
+                        <a href="/don/new/${association.id}" style="text-decoration: none;">
+                            <div class="card">
+                                ${association.image ?
+                                    `<div class="card-image" style="background-image: url('${imageUrl}');"></div>` :
+                                    `<div class="card-image">
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M20 5H4V19L13.2923 9.70649C13.6828 9.31595 14.3159 9.31591 14.7065 9.70641L20 15.0104V5ZM2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"></path>
+                                        </svg>
+                                    </div>`
+                                }
+                                
+                                <div class="progress-container">
+                                    <div class="progress">
+                                        <div class="progress-bar ${progressClass}" 
+                                             role="progressbar" 
+                                             style="width: ${progression}%;" 
+                                             aria-valuenow="${progression}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            ${progression.toFixed(1)}%
+                                        </div>
                                     </div>
                                 </div>
-                                <a href="{{ path('app_don_new', {'id': '${association.id}'}) }}" class="btn btn-primary">Faire un don</a>
+                                
+                                <div class="card__content" onclick="event.stopPropagation()">
+                                    <p class="card__title">${association.nom.toUpperCase()}</p>
+                                    <div class="card__description">
+                                        <p><strong>Description :</strong> ${association.description}</p>
+                                        <p><strong>Contact :</strong> ${association.contact}</p>
+                                        <p><strong>But :</strong> ${association.but}</p>
+                                        <p><strong>Objectif :</strong> ${association.montantDesire ? Number(association.montantDesire).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace('.', ',') : 'N/A'} TND</p>
+                                        ${qrCodeHtml}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 `;
                 container.innerHTML += card;

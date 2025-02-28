@@ -57,6 +57,8 @@ class Association
         minMessage: "Le but de l'association doit contenir au moins {{ limit }} caractères."
     )]
     private ?string $but = null;
+    #[ORM\Column(length: 255, nullable: true)]
+private ?string $siteWeb = null;
 
     /**
      * @var Collection<int, Don>
@@ -161,6 +163,16 @@ class Association
         return $this;
     }
 
+    public function getSiteWeb(): ?string
+{
+    return $this->siteWeb;
+}
+
+public function setSiteWeb(?string $siteWeb): static
+{
+    $this->siteWeb = $siteWeb;
+    return $this;
+}
     /**
      * @return Collection<int, Don>
      */

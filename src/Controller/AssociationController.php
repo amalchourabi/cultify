@@ -13,6 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 
 final class AssociationController extends AbstractController
 {
@@ -149,6 +151,29 @@ public function editAssociation($id, Request $req, EntityManagerInterface $em, A
 
         return $this->redirectToRoute('app_affiche');
     }
+    #[Route('/association/qrcode/{id}', name: 'app_association_qrcode')]
+public function generateQrCode($id, AssociationRepository $repo): Response
+{
+    $association = $repo->find($id);
+    if (!$association) {
+        throw $this->createNotFoundException('Association non trouvée');
+    }
+
+    $siteWeb = $association->getSiteWeb();
+    if (empty($siteWeb)) {
+        throw $this->createNotFoundException('Aucun site web disponible pour cette association');
+    }
+
+    // Générer le QR code avec le site web de l'association
+    $qrCodeContent = $siteWeb; // Le contenu du QR code est l'URL du site web
+    $qrCode = new QrCode($qrCodeContent);
+    $writer = new PngWriter();
+    $qrCodeResult = $writer->write($qrCode);
+    $qrCodeImage = $qrCodeResult->getString();
+
+    // Retourner l'image du QR code en tant que réponse
+    return new Response($qrCodeImage, 200, ['Content-Type' => 'image/png']);
+}
 
     #[Route('/associations', name: 'app_affiche')]
     public function afficheAssociation(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
@@ -195,6 +220,8 @@ public function editAssociation($id, Request $req, EntityManagerInterface $em, A
                 'image' => $association->getImage(),
                 'montantDesire' => $association->getMontantDesire(),
                 'pourcentageProgression' => $association->getPourcentageProgression(),
+                'siteWeb' => $association->getSiteWeb(),
+            'qrCodeUrl' => $this->generateUrl('app_association_qrcode', ['id' => $association->getId()]),
             ];
         }
     

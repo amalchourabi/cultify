@@ -91,6 +91,7 @@
 
                                             {# Bouton Confirmer #}
                                             <a href="{{ path('app_don_confirm', {'id': don.id}) }}" class="btn btn-sm btn-success">
+                                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
                                                 <i class="bi bi-check"></i> Confirmer
                                             </a>
                                         {% endif %}

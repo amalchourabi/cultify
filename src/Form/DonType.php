@@ -11,6 +11,10 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
+
+
 
 class DonType extends AbstractType
 {
@@ -26,6 +30,10 @@ class DonType extends AbstractType
                     'min' => 1, // Montant minimum
                     'step' => 0.01, // Permet les montants décimaux
                 ],
+            ])
+            ->add('captcha', Recaptcha3Type::class, [
+                'constraints' => new Recaptcha3(),
+                'action_name' => 'don',
             ]);
 
         // Champ association (uniquement en mode édition)
