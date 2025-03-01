@@ -15,6 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
+use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Pagerfanta;
 
 final class AssociationController extends AbstractController
 {
@@ -175,33 +177,52 @@ public function generateQrCode($id, AssociationRepository $repo): Response
     return new Response($qrCodeImage, 200, ['Content-Type' => 'image/png']);
 }
 
-    #[Route('/associations', name: 'app_affiche')]
-    public function afficheAssociation(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
-    {
-        $session = $request->getSession();
-        $userId = $session->get('user_id');
-        $user = $userRepository->find($userId);
-        $searchTerm = $request->query->get('search', '');
-    
-        // Filtrer les associations en fonction du terme de recherche
-        $associations = $repo->findBySearchTerm($searchTerm);
-    
-        if ($user && $user->getRole() === 'admin') {
-            return $this->render('association/afficher.html.twig', [
-                'associations' => $associations,
-                'searchTerm' => $searchTerm,
-            ]);
-        } else {
-            if ($user && $user->getRole() === 'organisateur') {
-                $userRepository->calculerContribution($user);
-            }
-            return $this->render('association/affiche_user.html.twig', [
-                'associations' => $associations,
-                'user' => $user,
-                'searchTerm' => $searchTerm,
-            ]);
+
+#[Route('/associations', name: 'app_affiche')]
+public function afficheAssociation(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
+{
+    // Récupérer l'utilisateur connecté depuis la session
+    $session = $request->getSession();
+    $userId = $session->get('user_id');
+    $user = $userRepository->find($userId);
+
+    // Récupérer le terme de recherche depuis la requête
+    $searchTerm = $request->query->get('search', '');
+
+    // Récupérer les associations filtrées par terme de recherche
+    $associations = $repo->findBySearchTerm($searchTerm);
+
+    // Créer un adaptateur Pagerfanta pour paginer les résultats
+    $adapter = new ArrayAdapter($associations);
+    $pagerfanta = new Pagerfanta($adapter);
+
+    // Définir la page actuelle (par défaut 1)
+    $pagerfanta->setCurrentPage($request->query->getInt('page', 1));
+
+    // Définir le nombre maximum d'éléments par page (ici 10)
+    $pagerfanta->setMaxPerPage(10);
+
+    // Si l'utilisateur est un admin, afficher la vue admin
+    if ($user && $user->getRole() === 'admin') {
+        return $this->render('association/afficher.html.twig', [
+            'pager' => $pagerfanta, // Passer l'objet Pagerfanta au template
+            'searchTerm' => $searchTerm, // Passer le terme de recherche pour l'affichage
+        ]);
+    } 
+    // Sinon, afficher la vue utilisateur
+    else {
+        // Si l'utilisateur est un organisateur, calculer sa contribution
+        if ($user && $user->getRole() === 'organisateur') {
+            $userRepository->calculerContribution($user);
         }
+
+        return $this->render('association/affiche_user.html.twig', [
+            'pager' => $pagerfanta, // Passer l'objet Pagerfanta au template
+            'user' => $user, // Passer l'utilisateur connecté
+            'searchTerm' => $searchTerm, // Passer le terme de recherche pour l'affichage
+        ]);
     }
+}
     #[Route('/associations/search', name: 'app_association_search', methods: ['GET'])]
     public function searchAssociations(Request $request, AssociationRepository $repo): JsonResponse
     {
@@ -229,22 +250,75 @@ public function generateQrCode($id, AssociationRepository $repo): Response
     }
 
     #[Route('/associationsUser', name: 'app_afficher')]
-    public function afficheAssociationUSer(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
-    {
-        $session = $request->getSession();
-        $userId = $session->get('user_id');
-        $user = $userRepository->find($userId);
+public function afficheAssociationUSer(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
+{
+     // Récupérer l'utilisateur connecté depuis la session
+     $session = $request->getSession();
+     $userId = $session->get('user_id');
+     $user = $userRepository->find($userId);
+ 
+     // Récupérer le terme de recherche depuis la requête
+     $searchTerm = $request->query->get('search', '');
+ 
+     // Récupérer les associations filtrées par terme de recherche
+     $associations = $repo->findBySearchTerm($searchTerm);
+ 
+     // Créer un adaptateur Pagerfanta pour paginer les résultats
+     $adapter = new ArrayAdapter($associations);
+     $pagerfanta = new Pagerfanta($adapter);
+ 
+     // Définir la page actuelle (par défaut 1)
+     $pagerfanta->setCurrentPage($request->query->getInt('page', 1));
+ 
+     // Définir le nombre maximum d'éléments par page (ici 10)
+     $pagerfanta->setMaxPerPage(10);
+ 
+     // Si l'utilisateur est un admin, afficher la vue admin
+     
+         // Si l'utilisateur est un organisateur, calculer sa contribution
+         if ($user && $user->getRole() === 'organisateur') {
+             $userRepository->calculerContribution($user);
+         }
+ 
+         return $this->render('association/affiche_user.html.twig', [
+             'pager' => $pagerfanta, // Passer l'objet Pagerfanta au template
+             'user' => $user, // Passer l'utilisateur connecté
+             'searchTerm' => $searchTerm, // Passer le terme de recherche pour l'affichage
+         ]);
+     
+}
+#[Route('/associationsAdmin', name: 'app_afficheradmin')]
+public function afficheAssociationAdmin(AssociationRepository $repo, UserRepository $userRepository, Request $request): Response
+{
+     // Récupérer l'utilisateur connecté depuis la session
+     $session = $request->getSession();
+     $userId = $session->get('user_id');
+     $user = $userRepository->find($userId);
+ 
+     // Récupérer le terme de recherche depuis la requête
+     $searchTerm = $request->query->get('search', '');
+ 
+     // Récupérer les associations filtrées par terme de recherche
+     $associations = $repo->findBySearchTerm($searchTerm);
+ 
+     // Créer un adaptateur Pagerfanta pour paginer les résultats
+     $adapter = new ArrayAdapter($associations);
+     $pagerfanta = new Pagerfanta($adapter);
+ 
+     // Définir la page actuelle (par défaut 1)
+     $pagerfanta->setCurrentPage($request->query->getInt('page', 1));
+ 
+     // Définir le nombre maximum d'éléments par page (ici 10)
+     $pagerfanta->setMaxPerPage(10);
+ 
+     // Si l'utilisateur est un admin, afficher la vue admin
 
-        if ($user && $user->getRole() === 'organisateur') {
-            $userRepository->calculerContribution($user);
-        }
-
-        $associations = $repo->findAll();
-        return $this->render('association/affiche_user.html.twig', [
-            'associations' => $associations,
-            'user' => $user
-        ]);
-    }
-   
+         return $this->render('association/afficher.html.twig', [
+             'pager' => $pagerfanta, // Passer l'objet Pagerfanta au template
+             'searchTerm' => $searchTerm, // Passer le terme de recherche pour l'affichage
+         ]);
+     
+     
+}
     
 }

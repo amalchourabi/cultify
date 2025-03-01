@@ -18,32 +18,44 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Service\PdfGenerator;
 use Psr\Log\LoggerInterface;
 use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3Validator;
+use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Pagerfanta;
 
 final class DonController extends AbstractController
 {
     #[Route('/don', name: 'app_don_index')]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        // Get the user from the session
-        $session = $request->getSession();
-        $userId = $session->get('user_id');
-    
-        if (!$userId) {
-            $this->addFlash('error', 'Vous devez être connecté pour voir vos dons.');
-            return $this->redirectToRoute('app_simulate_user');
-        }
-    
-        // Fetch dons from the database
-        $dons = $entityManager->getRepository(Don::class)->findBy(['idUser' => $userId]);
-    
-        // Get the reCAPTCHA site key from the container
-        $recaptchaSiteKey = $this->getParameter('recaptcha_site_key');
-    
-        return $this->render('don/index.html.twig', [
-            'dons' => $dons,
-            'recaptcha_site_key' => $recaptchaSiteKey,
-        ]);
+public function index(Request $request, EntityManagerInterface $entityManager): Response
+{
+    // Récupérer l'utilisateur depuis la session
+    $session = $request->getSession();
+    $userId = $session->get('user_id');
+
+    if (!$userId) {
+        $this->addFlash('error', 'Vous devez être connecté pour voir vos dons.');
+        return $this->redirectToRoute('app_simulate_user');
     }
+
+    // Récupérer tous les dons de l'utilisateur
+    $dons = $entityManager->getRepository(Don::class)->findBy(['idUser' => $userId]);
+
+    // Créer un adaptateur Pagerfanta pour paginer les résultats
+    $adapter = new ArrayAdapter($dons);
+    $pager = new Pagerfanta($adapter);
+
+    // Définir la page actuelle (par défaut 1)
+    $pager->setCurrentPage($request->query->getInt('page', 1));
+
+    // Définir le nombre maximum d'éléments par page (ici 10)
+    $pager->setMaxPerPage(10);
+
+    // Récupérer la clé reCAPTCHA
+    $recaptchaSiteKey = $this->getParameter('recaptcha_site_key');
+
+    return $this->render('don/index.html.twig', [
+        'pager' => $pager, // Passer l'objet Pagerfanta au template
+        'recaptcha_site_key' => $recaptchaSiteKey,
+    ]);
+}
 #[Route('/don/new/{id}', name: 'app_don_new')]
 public function new(
     Request $request,

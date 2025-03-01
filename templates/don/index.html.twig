@@ -54,7 +54,7 @@
 <div class="container">
     <div class="row justify-content-center"> {# Centrer horizontalement #}
         <div class="col-md-10"> {# Limiter la largeur du tableau #}
-            <h1>Mes dons</h1>
+            <h1>Mes dons ({{ pager.nbResults }})</h1>
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -68,7 +68,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for don in dons %}
+                            {% for don in pager.currentPageResults %}
                                 <tr>
                                     {# Afficher le nom de l'association (gérer le cas où elle est null) #}
                                     <td>{{ don.association.nom }}</td>
@@ -107,6 +107,11 @@
                         </table>
                     </div>
                 </div>
+            </div>
+
+            {# Pagination #}
+            <div class="d-flex justify-content-center">
+                {{ pagerfanta(pager, 'twitter_bootstrap5') }}
             </div>
         </div>
     </div>
