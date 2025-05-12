@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+<head>
+	<!-- Mobile Specific Meta -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Favicon-->
+	<link rel="shortcut icon" href="{{ asset('front/img/fav.png') }}">
+	<!-- Author Meta -->
+	<meta name="author" content="codepixer">
+	<!-- Meta Description -->
+	<meta name="description" content="">
+	<!-- Meta Keyword -->
+	<meta name="keywords" content="">
+	<!-- meta character set -->
+	<meta charset="UTF-8">
+	<!-- Site Title -->
+	<title>Cultify</title>
+
+	<!--
+	CSS
+	============================================= -->
+	<link rel="stylesheet" href="{{ asset('front/css/linearicons.css') }}">
+	<link rel="stylesheet" href="{{ asset('front/css/font-awesome.min.css') }}">
+	<link rel="stylesheet" href="{{ asset('front/css/bootstrap.css') }}">
+	<link rel="stylesheet" href="{{ asset('front/css/magnific-popup.css') }}">
+	<link rel="stylesheet" href="{{ asset('front/css/nice-select.css') }}">					
+	<link rel="stylesheet" href="{{ asset('front/css/animate.min.css') }}">
+	<link rel="stylesheet" href="{{ asset('front/css/owl.carousel.css') }}">
+	<link rel="stylesheet" href="{{ asset('front/css/main.css') }}">
+<header id="header" id="home">
+		<hr>
+		<div class="container">
+			<div class="row align-items-center justify-content-between d-flex">
+				<div id="logo">
+					<a href="{{ path('app_home') }}"><img src="{{ asset('front/img/logo.png') }}" alt="" title="" /></a>
+				</div>
+				<nav id="nav-menu-container">
+					<ul class="nav-menu">
+					{% if is_granted('ROLE_ADMIN') %}
+                             <a href="{{ path('admin_home') }}" class="btn btn-primary">Admin Dashboard</a>
+                            {% endif %}
+						<li class="menu-active"><a href="{{ path('app_home') }}">Acceuil</a></li>
+                        <li><a href="{{ path('app_event_index') }}">évènements</a></li>
+				        <li><a href="{{ path('app_contenu_multi_media_list') }}">Encyclopédie</a></li>
+				        <li><a href="{{ path('app_don_index') }}">Don</a></li>
+						<li><a href="{{path('app_afficher')}}">Association</a></li>
+                        <li><a href="{{ path('app_reclamation_new') }}">Réclamation</a></li>
+                        <li><a href="{{ path('app_profile') }}">Profile</a></li>	
+						<li><a href="{{ path('app_logout') }}">Logout</a></li>		          
+					</ul>
+				</nav><!-- #nav-menu-container -->		    		
+			</div>
+		</div>
+	</header><!-- #header -->
+</head>
+<body>
+{% block body %}
+	<section class="banner-area relative" id="home">	
+		<div class="overlay overlay-bg"></div>
+		<div class="container">
+			<div class="row d-flex align-items-center justify-content-center">
+				<div class="about-content col-lg-12">
+					<h1 class="text-white">
+
+					</h1>	
+                    <p class="text-white link-nav"><a href="app_home">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="app_reclamation_new"> Réclamation</a></p>
+					
+				</div>											
+			</div>
+		</div>
+	</section>
+{% endblock %}
+	
+</body>
+<footer class="footer-area section-gap">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-5 col-md-6 col-sm-6">
+					<div class="single-footer-widget">
+						<h6>Qui sommes-nous ?</h6>
+						<p>
+							Nous sommes l’épicentre des expériences culturelles et sociales. Découvrez une plateforme innovante qui réinvente votre quotidien avec des festivals vibrants, des avant-premières captivantes et bien plus encore. Rejoignez-nous pour vivre des moments d’exception et explorer un univers où l’art rencontre l’émotion.
+						</p>
+						
+					</div>
+				</div>				
+				<div class="col-lg-2 col-md-6 col-sm-6 social-widget">
+					<div class="single-footer-widget">
+						<h6>Follow Us</h6>
+						<p>Let us be social</p>
+						
+					</div>
+				</div>							
+			</div>
+		</div>
+	</footer>	
+    <script src="{{ asset('front/js/vendor/jquery-2.2.4.min.js') }}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="{{ asset('js/vendor/bootstrap.min.js') }}"></script>			
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">	
+  	<script src="{{ asset('front/js/easing.min.js') }}"></script>			
+	<script src="{{ asset('front/js/hoverIntent.js') }}"></script>
+	<script src="{{ asset('front/js/superfish.min.js') }}"></script>	
+	<script src="{{ asset('front/js/jquery.ajaxchimp.min.js') }}"></script>
+	<script src="{{ asset('front/js/jquery.magnific-popup.min.js') }}"></script>	
+	<script src="{{ asset('front/js/owl.carousel.min.js') }}"></script>	
+	<script src="{{ asset('front/js/imagesloaded.pkgd.min.js') }}"></script>
+	<script src="{{ asset('front/js/justified.min.js') }}"></script>					
+	<script src="{{ asset('front/js/jquery.sticky.js') }}"></script>
+	<script src="{{ asset('front/js/jquery.nice-select.min.js') }}"></script>			
+	<script src="{{ asset('front/js/parallax.min.js') }}"></script>		
+	<script src="{{ asset('front/js/mail-script.js') }}"></script>	
+	<script src="{{ asset('front/js/main.js') }}"></script>	
+</html>

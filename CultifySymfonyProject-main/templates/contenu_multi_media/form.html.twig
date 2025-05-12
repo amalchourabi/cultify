@@ -1,0 +1,41 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Hello ContenuMultiMediaController!{% endblock %}
+
+{% block body %}
+<h1> {{ title }} </h1>
+{{ form_start(form,{'attr':{'novalidate':'novalidate'}}) }}
+<table>
+<tr>
+<td>{{ form_label(form.TitreMedia,"Titre de article") }}</td>
+<td>{{form_widget(form.TitreMedia)}}</td>
+<td>{{form_errors(form.TitreMedia)}}</td>
+</tr>
+<tr>
+<td>{{ form_label(form.TextMedia,"Text de article") }}</td>
+<td>{{form_widget(form.TextMedia)}}</td>
+<td>{{form_errors(form.TextMedia)}}</td>
+</tr>
+<tr>
+ <tr>
+    <td>{{ form_label(form.photoMedia, "Photo de l'article") }}</td>
+    <td>{{ form_widget(form.photoMedia) }}</td>
+    <td>{{ form_errors(form.photoMedia) }}</td>
+</tr>
+
+</tr>
+<tr>
+<td>{{ form_label(form.DateMedia,"date de article") }}</td>
+<td>{{form_widget(form.DateMedia)}}</td>
+<td>{{form_errors(form.DateMedia)}}</td>
+</tr>
+</tr>
+<tr>
+<td>{{ form_label(form.CategorieMedia,"categorie de article") }}</td>
+<td>{{form_widget(form.CategorieMedia)}}</td>
+<td>{{form_errors(form.CategorieMedia)}}</td>
+</tr>
+</table>
+{{form_widget(form.save)}} 
+{{form_end(form)}}
+{% endblock %}

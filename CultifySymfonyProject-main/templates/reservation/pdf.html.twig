@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reservation #{{ reservation.getIdR }}</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .reservation-details {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
+        }
+        .reservation-details p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .reservation-details strong {
+            color: #333;
+        }
+        .highlight {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="data:image/png;base64,{{ logoBase64 }}" alt="Logo" class="logo" />
+        </div>
+        <h1>Détails de la Réservation</h1>
+        <div class="reservation-details">
+            <p><strong>ID Réservation :</strong> <span class="highlight">{{ reservation.getIdR }}</span></p>
+            <p><strong>État :</strong> <span class="highlight">{{ reservation.getEtat }}</span></p>
+            <p><strong>Date de Réservation :</strong> {{ reservation.getDateR ? reservation.dateR|date('Y-m-d') : 'N/A' }}</p>
+            <p><strong>Thème :</strong> {{ reservation.getTheme }}</p>
+            <p><strong>URL :</strong> {{ reservation.getUrl ?? 'N/A' }}</p>
+            <p><strong>Nombre de Tickets :</strong> <span class="highlight">{{ reservation.getNbTickets }}</span></p>
+            <p><strong>Événement :</strong> {{ reservation.event.titre }}</p>
+            <p><strong>Organisation :</strong> {{ reservation.event.organisation }}</p>
+            <p><strong>Catégorie :</strong> {{ reservation.event.categorie }}</p>
+            <p><strong>Prix :</strong> {{ reservation.event.prix ? reservation.event.prix|number_format(2, '.', ',') ~ ' €' : 'N/A' }}</p>
+        </div>
+    </div>
+</body>
+</html>

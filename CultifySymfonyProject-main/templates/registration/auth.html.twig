@@ -1,0 +1,68 @@
+{% extends 'baseLogin.html.twig' %}
+
+{% block title %}Inscription - Créez votre compte{% endblock %}
+
+{% block body %}
+<div class="wrapper">
+    <div class="title text-center mb-3">
+        <h1 class="h3">Inscription</h1>
+        <p class="text-muted">Créez votre compte pour accéder à notre plateforme.</p>
+    </div>
+    <form method="post" enctype="multipart/form-data" novalidate class="needs-validation form-container">
+        {{ form_errors(registrationForm) }}
+
+        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.nom, { 'label': 'Nom', 'attr': {'class': 'form-control', 'placeholder': 'Entrez votre nom'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.prenom, { 'label': 'Prénom', 'attr': {'class': 'form-control', 'placeholder': 'Entrez votre prénom'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.username, { 'label': 'Nom d\'utilisateur', 'attr': {'class': 'form-control', 'placeholder': 'Choisissez un nom d\'utilisateur'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.email, { 'label': 'Adresse email', 'attr': {'class': 'form-control', 'placeholder': 'Entrez votre email'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.plainPassword, { 'label': 'Mot de passe', 'attr': {'class': 'form-control', 'placeholder': 'Choisissez un mot de passe'} }) }}
+            </div>
+            
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.num_tel, { 'label': 'Numéro de téléphone', 'attr': {'class': 'form-control', 'placeholder': 'Entrez votre numéro de téléphone'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.gender, { 'label': 'Genre', 'attr': {'class': 'form-control'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.Datedenaissance, { 'label': 'Date de naissance', 'attr': {'class': 'form-control'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.profilepicture, { 'label': 'Photo de profil', 'attr': {'class': 'form-control-file'} }) }}
+            </div>
+            <div class="form-group mb-2">
+                {{ form_row(registrationForm.roles, { 'label': 'Rôle', 'attr': {'class': 'form-control'} }) }}
+            </div>
+            <div class="form-group form-check mb-3">
+                {{ form_row(registrationForm.agreeTerms, { 'label': 'J\'accepte les termes et conditions', 'attr': {'class': 'form-check-input'} }) }}
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">S'inscrire</button>
+            </div>
+        {{ form_end(registrationForm) }}
+
+        <div class="form-group text-center mt-3">
+            <a href="{{ path('app_login') }}" class="btn btn-outline-secondary btn-block">Retour à la connexion</a>
+        </div>
+    </form>
+    <input type="hidden" id="form_captcha" name="form[captcha]" /><script>
+    var recaptchaCallback_form_captcha = function() {
+    grecaptcha.execute('<YOUR-RECAPTCHA-KEY>', {action: 'landing'}).then(function(token) {
+    document.getElementById('form_captcha').value = token;
+    });
+    };
+    </script><script src="https://www.google.com/recaptcha/api.js?render=<YOUR-RECAPTCHA-KEY>&onload=recaptchaCallback_form_captcha" async defer></script> 
+</form>
+</div>
+{% endblock %}

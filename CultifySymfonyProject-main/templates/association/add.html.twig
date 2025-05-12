@@ -1,0 +1,105 @@
+{% extends 'baseback.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }} {# Conserve les styles de base.html.twig #}
+    <style>
+        .form-container {
+            background-color: #f8f9fa; /* Couleur de fond */
+            padding: 20px;
+            border-radius: 10px; /* Bordures arrondies */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            margin-top: 50px; /* Espacement en haut */
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem; /* Espacement entre les champs */
+        }
+
+        .btn-primary {
+            padding: 10px; /* Espacement interne */
+            font-size: 16px; /* Taille de police */
+            width: auto; /* Largeur automatique pour le bouton */
+            display: block; /* Pour centrer le bouton */
+            margin: 0 auto; /* Centrer horizontalement */
+        }
+
+        .form-label {
+            font-weight: bold; /* Texte en gras pour les labels */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center"> {# Centrer horizontalement #}
+        <div class="col-md-8"> {# Limiter la largeur du formulaire test #}
+            <div class="form-container">
+               {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'form-horizontal', 'enctype': 'multipart/form-data'}}) }}
+
+                    <div class="form-group row">
+                        {{ form_label(form.nom, 'Nom de l\'association', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                        <div class="col-sm-9">
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                        <div class="col-sm-9">
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        {{ form_label(form.contact, 'Contact', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                        <div class="col-sm-9">
+                            {{ form_widget(form.contact, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.contact) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        {{ form_label(form.but, 'But', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                        <div class="col-sm-9">
+                            {{ form_widget(form.but, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.but) }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(form.montantDesire, 'montantDesire', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                        <div class="col-sm-9">
+                            {{ form_widget(form.montantDesire, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.montantDesire) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        {{ form_label(form.image, 'Image', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                        <div class="col-sm-9">
+                            {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.image) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        {{ form_label(form.siteWeb, 'lizn de site web', {'label_attr': {'class': 'col-sm-3 col-form-label form-label'}}) }}
+                        <div class="col-sm-9">
+                            {{ form_widget(form.siteWeb, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.siteWeb) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12 text-center"> {# Centrer le bouton test2#}
+                            <button type="submit" class="btn btn-primary">Confirmer</button>
+                        </div>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

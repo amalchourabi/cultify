@@ -1,0 +1,151 @@
+{% extends 'basefront.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }} {# Conserve les styles de base.html.twig #}
+    <style>
+        .card {
+            margin-top: 50px; /* Espacement en haut */
+            border-radius: 10px; /* Bordures arrondies */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+        }
+
+        .card-body {
+            padding: 20px; /* Espacement interne */
+        }
+
+        h1 {
+            text-align: center; /* Centrer le titre */
+            margin-bottom: 30px; /* Espacement en bas du titre */
+        }
+
+        .table {
+            width: 100%; /* Largeur du tableau */
+            margin-bottom: 1rem; /* Espacement en bas du tableau */
+            color: #212529; /* Couleur du texte */
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem; /* Espacement interne des cellules */
+            vertical-align: top; /* Alignement vertical */
+            border-top: 1px solid #dee2e6; /* Bordure supérieure */
+        }
+
+        .table thead th {
+            vertical-align: bottom; /* Alignement vertical des en-têtes */
+            border-bottom: 2px solid #dee2e6; /* Bordure inférieure */
+        }
+
+        .table tbody + tbody {
+            border-top: 2px solid #dee2e6; /* Bordure entre les groupes de lignes */
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.05); /* Couleur de fond des lignes impaires */
+        }
+
+        .btn-sm {
+            margin: 2px; /* Espacement entre les boutons */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Banner Section -->
+    <section class="banner-area relative" id="home">	
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        Liste des Événements
+                    </h1>	
+                    <p class="text-white link-nav">
+                        <a href="{{ path('app_home') }}">Home</a>  
+                        <span class="lnr lnr-arrow-right"></span>  
+                        <a href="{{ path('app_event_index') }}">Événements</a>
+                    </p>
+                </div>											
+            </div>
+        </div>
+    </section>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center"> {# Centrer horizontalement #}
+            <div class="col-md-12"> {# Limiter la largeur du tableau #}
+                <h1>Liste des Événements</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Titre</th>
+                                        <th>Description</th>
+                                        <th>Date</th>
+                                        <th>Organisation</th>
+                                        <th>Capacité</th>
+                                        <th>Places Dispo</th>
+                                        <th>Catégorie</th>
+                                        <th>Prix</th>
+                                        <th>Localisation</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for event in events %}
+                                    <tr>
+                                        <td>{{ event.getIdE() }}</td>
+                                        <td>{{ event.getTitre() }}</td>
+                                        <td>{{ event.getDescription() }}</td>
+                                        <td>{{ event.getDateE() ? event.getDateE()|date('Y-m-d') : '' }}</td>
+                                        <td>{{ event.getOrganisation() }}</td>
+                                        <td>{{ event.getCapacite() }}</td>
+                                        <td>{{ event.getNbplaces() }}</td>
+                                        <td>{{ event.getCategorie() }}</td>
+                                        <td>{{ event.getPrix ? event.getPrix|number_format(2, '.', ',') ~ ' €' : 'N/A' }}</td>
+                                        <td>
+                                            {# Small map or link to view location #}
+                                            <div id="map-{{ event.idE }}" style="height: 100px; width: 150px;"></div>
+                                            <a href="https://www.openstreetmap.org/?mlat={{ event.latitude }}&mlon={{ event.longitude }}#map=15/{{ event.latitude }}/{{ event.longitude }}" target="_blank" class="btn btn-link btn-sm">
+                                                Voir sur la carte
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('app_event_show', {'id_e': event.getIdE()}) }}" class="btn btn-info btn-sm">Voir</a>
+                                            <a href="{{ path('app_event_edit', {'id_e': event.getIdE()}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                            <a href="{{ path('app_reservation_new', {'id_e': event.getIdE()}) }}" class="btn btn-primary btn-sm">Réserver</a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="11" class="text-center text-muted">Aucun événement trouvé</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Include Leaflet CSS and JS #}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        // Initialize small maps for each event
+        {% for event in events %}
+            var map{{ event.idE }} = L.map('map-{{ event.idE }}').setView([{{ event.latitude ?? 33.892166 }}, {{ event.longitude ?? 9.561555 }}], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map{{ event.idE }});
+
+            L.marker([{{ event.latitude ?? 33.892166 }}, {{ event.longitude ?? 9.561555 }}]).addTo(map{{ event.idE }});
+        {% endfor %}
+    </script>
+{% endblock %}

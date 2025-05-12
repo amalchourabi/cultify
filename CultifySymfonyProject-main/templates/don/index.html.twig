@@ -1,0 +1,128 @@
+{% extends 'basefront.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }} {# Conserve les styles de base.html.twig #}
+    <style>
+        .card {
+            margin-top: 50px; /* Espacement en haut */
+            border-radius: 10px; /* Bordures arrondies */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+        }
+
+        .card-body {
+            padding: 20px; /* Espacement interne */
+        }
+
+        h1 {
+            text-align: center; /* Centrer le titre */
+            margin-bottom: 30px; /* Espacement en bas du titre */
+        }
+
+        .table {
+            width: 100%; /* Largeur du tableau */
+            margin-bottom: 1rem; /* Espacement en bas du tableau */
+            color: #212529; /* Couleur du texte */
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem; /* Espacement interne des cellules */
+            vertical-align: top; /* Alignement vertical */
+            border-top: 1px solid #dee2e6; /* Bordure supérieure */
+        }
+
+        .table thead th {
+            vertical-align: bottom; /* Alignement vertical des en-têtes */
+            border-bottom: 2px solid #dee2e6; /* Bordure inférieure */
+        }
+
+        .table tbody + tbody {
+            border-top: 2px solid #dee2e6; /* Bordure entre les groupes de lignes */
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.05); /* Couleur de fond des lignes impaires */
+        }
+
+        .btn-sm {
+            margin: 2px; /* Espacement entre les boutons */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<br style="line-height: 50px;">
+<div class="container">
+    <div class="row justify-content-center"> {# Centrer horizontalement #}
+        <div class="col-md-10"> {# Limiter la largeur du tableau #}
+            <h1>Mes dons ({{ pager.nbResults }})</h1>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Association</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for don in pager.currentPageResults %}
+                                <tr>
+                                    {# Afficher le nom de l'association (gérer le cas où elle est null) #}
+                                    <td>{{ don.association.nom }}</td>
+                                    <td>{{ don.montant }}</td>
+                                    <td>{{ don.status }}</td>
+                                    <td>
+                                        {# Afficher les actions uniquement si le statut est "en_attente" #}
+                                        {% if don.status == 'en_attente' %}
+                                            {# Bouton Modifier #}
+                                            <a href="{{ path('app_don_edit', {'id': don.id }) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil"></i> Modifier
+                                            </a>
+
+                                            {# Formulaire de Suppression #}
+                                            <form method="post" action="{{ path('app_don_delete', {'id': don.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce don ?');" style="display: inline-block;">
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="bi bi-trash"></i> Supprimer
+                                                </button>
+                                            </form>
+
+                                            {# Bouton Confirmer #}
+                                            <a href="{{ path('app_don_confirm', {'id': don.id}) }}" class="btn btn-sm btn-success">
+                                                <i class="bi bi-check"></i> Confirmer
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                {# Afficher un message si aucun don n'est trouvé #}
+                                <tr>
+                                    <td colspan="4" class="text-center">Aucun don trouvé.</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# Pagination #}
+            <div class="d-flex justify-content-center">
+                {{ pagerfanta(pager, 'twitter_bootstrap5') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

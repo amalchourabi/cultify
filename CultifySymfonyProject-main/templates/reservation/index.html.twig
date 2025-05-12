@@ -1,0 +1,47 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Reservation index{% endblock %}
+
+{% block body %}
+    <h1>Reservation index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id_r</th>
+                <th>Etat</th>
+                <th>Date_r</th>
+                <th>Theme</th>
+                <th>Url</th>
+                <th>Nb_tickets</th>
+                
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.getIdR }}</td>
+                <td>{{ reservation.getEtat }}</td>
+                <td>{{ reservation.getDateR ? reservation.dateR|date('Y-m-d') : '' }}</td>
+                <td>{{ reservation.getTheme }}</td>
+                <td>{{ reservation.getUrl }}</td>
+                <td>{{ reservation.getNbTickets }}</td>
+                
+                <td>
+                    <a href="{{ path('app_reservation_show', {'id_r': reservation.getIdR}) }}">show</a>
+                    <a href="{{ path('app_reservation_edit', {'id_r': reservation.getIdR}) }}">edit</a>
+                    <a href="{{ path('app_reservation_delete', {'id_r': reservation.getIdR}) }}">delete</a>
+                    <a href="{{ path('app_reservation_pdf', {'id_r': reservation.getIdR}) }}" target="_blank">Download PDF</a>
+                   
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

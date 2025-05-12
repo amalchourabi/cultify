@@ -1,0 +1,14 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Confirmation du don{% endblock %}
+
+{% block body %}
+    <h1>Merci pour votre don !</h1>
+
+    <p>
+        Votre don de <strong>{{ don.montant }} €</strong> à l'association
+        <strong>{{ don.association.nom }}</strong> a bien été enregistré.
+    </p>
+
+    <a href="{{ path('app_don') }}" class="btn btn-primary">Faire un autre don</a>
+{% endblock %}

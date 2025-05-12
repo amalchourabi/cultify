@@ -1,0 +1,131 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Détails de l'événement{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Détails de l'événement</h1>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Titre</h5>
+                        <p class="card-text">{{ event.getTitre }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Description</h5>
+                        <p class="card-text">{{ event.getDescription }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Date</h5>
+                        <p class="card-text">{{ event.getDateE ? event.getDateE|date('Y-m-d') : '' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Organisation</h5>
+                        <p class="card-text">{{ event.getOrganisation }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Capacité</h5>
+                        <p class="card-text">{{ event.getCapacite }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Places disponibles</h5>
+                        <p class="card-text">{{ event.getNbplaces }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Catégorie</h5>
+                        <p class="card-text">{{ event.getCategorie }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Prix</h5>
+                        <p class="card-text">{{ event.getPrix }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Image</h5>
+                        <img src="{{ asset('uploads/' ~ event.getImage) }}" alt="Image de l'événement" class="img-fluid" style="width: 200px; height: auto;">
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="card-title text-primary">Localisation</h5>
+                        <div id="map" style="height: 300px;">
+                            <p class="text-muted">Chargement de la carte...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="{{ path('app_event_index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+
+            <div>
+                <a href="{{ path('app_event_edit', {'id_e': event.getIdE}) }}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <a href="{{ path('app_reservation_new', { id_e: event.idE }) }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Ajouter une réservation
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            {{ include('event/_delete_form.html.twig') }}
+        </div>
+    </div>
+
+    {# Charger les fichiers Leaflet via CDN #}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Vérifiez si les valeurs de latitude et de longitude sont définies et valides
+        var latitude = {{ event.latitude ?? 33.892166 }};
+        var longitude = {{ event.longitude ?? 9.561555 }};
+
+        if (typeof latitude === 'number' && typeof longitude === 'number' && !isNaN(latitude) && !isNaN(longitude)) {
+            // Initialiser la carte avec Leaflet
+            var map = L.map('map').setView([latitude, longitude], 13);
+
+            // Ajouter les tuiles OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Ajouter un marqueur à l'emplacement de l'événement
+            L.marker([latitude, longitude]).addTo(map);
+        } else {
+            console.error('Latitude et longitude ne sont pas définies ou ne sont pas des nombres valides.');
+            document.getElementById('map').innerHTML = '<p class="text-danger">La carte ne peut pas être affichée car les coordonnées sont invalides.</p>';
+        }
+    </script>
+{% endblock %}

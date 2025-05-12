@@ -1,0 +1,50 @@
+{# templates/security/login.html.twig #}
+{% extends 'baseLogin.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+<div class="wrapper">
+    <div class="title">
+        <span>Login Form</span>
+    </div>
+    <form method="post">
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="mb-3">
+                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <i class="fas fa-user"></i>
+            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus>
+        </div>
+        <div class="form-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        </div>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <!-- Google reCAPTCHA -->
+        <input type="hidden" id="form_captcha" name="form[captcha]" />
+        <script>
+            var recaptchaCallback_form_captcha = function() {
+                grecaptcha.execute('<YOUR-RECAPTCHA-KEY>', {action: 'login'}).then(function(token) {
+                    document.getElementById('form_captcha').value = token;
+                });
+            };
+        </script>
+        <script src="https://www.google.com/recaptcha/api.js?render=<YOUR-RECAPTCHA-KEY>&onload=recaptchaCallback_form_captcha" async defer></script>
+        
+        <div class="pass"><a href="{{ path('app_forgot_password_request') }}">Forgot password?</a></div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </div>
+        <div class="signup-link">Not a member? <a href="{{ path('app_register') }}">Signup now</a></div>
+    </form>
+</div>
+{% endblock %}

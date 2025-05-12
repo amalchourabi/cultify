@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>cultify</title>
+    <meta charset="UTF-8">
+    <title>PDF Layout</title>
+    <style>
+        /* Define your CSS styles for the PDF here */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .other-parts {
+            margin-top: 20px;
+        }
+        .list-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .list-item-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .list-item-info {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="logo-container">
+        <img src="{{ logoBase64 }}" alt="Logo" class="logo" />
+    </div>
+    <div class="other-parts">
+        <h2>Applicants Informations:</h2>
+        <div class="list-item">
+            <div class="list-item-title">{{ contenu.TitreMedia }}</div>
+            <div class="list-item-info">
+                <p><strong></strong> {{ contenu.TextMedia }}</p>
+                <img src="{{ imageBase64 }}" alt="{{ contenu.PhotoMedia }}" height="150px" />
+                <p><strong></strong> {{ contenu.CategorieMedia }}</p>
+                <p><b>Publication Date : </b> {{ contenu.DateMedia | date('d-m-Y') }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

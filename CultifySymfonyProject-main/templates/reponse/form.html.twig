@@ -1,0 +1,69 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+
+{% if form.vars.errors|length > 0 %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for error in form.vars.errors %}
+                <li>{{ error.message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<div class="mb-3">
+    {{ form_label(form.dateReponse, 'Date de réponse', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.dateReponse, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.dateReponse) }}
+    
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.titre, 'Titre', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': 'Entrez un titre'}}) }}
+    {{ form_errors(form.titre) }}
+   
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.contenu, 'Contenu', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.contenu, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Décrivez la réponse...'}}) }}
+    {{ form_errors(form.contenu) }}
+    
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.offre, 'Offre', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.offre, {'attr': {'class': 'form-control', 'placeholder': 'Entrez une offre'}}) }}
+    {{ form_errors(form.offre) }}
+    
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.reclamation, 'Réclamation associée', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.reclamation, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.reclamation) }}
+    
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.piece_jointe, 'Pièce jointe (optionnelle)', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.piece_jointe, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.piece_jointe) }}
+    
+</div>
+
+<div class="mb-3">
+    {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+</div>
+
+{{ form_end(form) }}
+
+<a href="{{ path('app_reponse_list') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+{% endblock %}

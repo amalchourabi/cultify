@@ -1,0 +1,41 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Hello ContenuMultiMediaController!{% endblock %}
+
+{% block body %}
+<h1> {{ title }} </h1>
+{{ form_start(form,{'attr':{'novalidate':'novalidate'}}) }}
+<table>
+<tr>
+<td>{{ form_label(form.TextQuestion,"Question ") }}</td>
+<td>{{form_widget(form.TextQuestion)}}</td>
+<td>{{form_errors(form.TextQuestion)}}</td>
+</tr>
+<tr>
+<td>{{ form_label(form.ResponseProp1,"Response Proposé 1") }}</td>
+<td>{{form_widget(form.ResponseProp1)}}</td>
+<td>{{form_errors(form.ResponseProp1)}}</td>
+</tr>
+<tr>
+ <tr>
+    <td>{{ form_label(form.ResponseProp2, "Response Proposé 2") }}</td>
+    <td>{{ form_widget(form.ResponseProp2) }}</td>
+    <td>{{ form_errors(form.ResponseProp2) }}</td>
+</tr>
+
+</tr>
+<tr>
+<td>{{ form_label(form.ResponseProp3,"Response Proposé 3") }}</td>
+<td>{{form_widget(form.ResponseProp3)}}</td>
+<td>{{form_errors(form.ResponseProp3)}}</td>
+</tr>
+</tr>
+<tr>
+<td>{{ form_label(form.ResponseCorrect,"Response Correct") }}</td>
+<td>{{form_widget(form.ResponseCorrect)}}</td>
+<td>{{form_errors(form.ResponseCorrect)}}</td>
+</tr>
+</table>
+{{form_widget(form.save)}} 
+{{form_end(form)}}
+{% endblock %}

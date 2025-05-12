@@ -1,0 +1,84 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Statistiques des contenus multimédias par catégorie{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .chart-container {
+            width: 50%;
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1 class="text-center mb-4">Statistiques des contenus multimédias par catégorie</h1>
+
+    {# Graphique circulaire #}
+    <div class="chart-container">
+        <canvas id="contenuStatsChart"></canvas>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Récupérer les données des statistiques depuis Twig
+        const stats = {{ stats|json_encode|raw }};
+
+        // Préparer les données pour Chart.js
+        const labels = stats.map(stat => stat.category);
+        const data = stats.map(stat => stat.count);
+
+        // Couleurs pour chaque catégorie
+        const backgroundColors = [
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+        ];
+
+        // Configuration du graphique
+        const ctx = document.getElementById('contenuStatsChart').getContext('2d');
+        const contenuStatsChart = new Chart(ctx, {
+            type: 'pie', // Type de graphique (camembert)
+            data: {
+                labels: labels, // Étiquettes (catégories)
+                datasets: [{
+                    label: 'Nombre de contenus multimédias',
+                    data: data, // Données (nombre de contenus multimédias)
+                    backgroundColor: backgroundColors, // Couleurs des sections
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top', // Position de la légende
+                    },
+                    tooltip: {
+                        enabled: true, // Activer les infobulles
+                    },
+                    // Afficher les pourcentages dans les sections du graphique
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value * 100) / total).toFixed(2) + '%';
+                            return percentage;
+                        },
+                        color: '#fff', // Couleur du texte
+                        font: {
+                            size: 14, // Taille de la police
+                            weight: 'bold', // Gras
+                        },
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{# templates/quiz/details.html.twig #}
+
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Détails du Quiz{% endblock %}
+
+{% block body %}
+    <h1>Détails du Quiz</h1>
+
+    <p><b>ID : </b> {{ quiz.idQuiz }}</p>
+    <p><b>Titre : </b> {{ quiz.TitreQuiz }}</p>
+    <p><b>Date : </b> {{ quiz.DateQuiz | date('d-m-Y') }}</p>
+
+    <h2>Questions :</h2>
+    <form action="{{ path('app_quiz_submit', {'id': quiz.idQuiz}) }}" method="POST">
+        <ul>
+            {% for question in quiz.Questions %}
+                <li>
+                    <p><b>Question : </b> {{ question.TextQuestion }}</p>
+                    <p><b>Options : </b></p>
+                    <ul>
+                        <li>
+                            <input type="radio" name="responses[{{ question.idQuestion }}]" value="{{ question.ResponseProp1 }}"> {{ question.ResponseProp1 }}
+                        </li>
+                        <li>
+                            <input type="radio" name="responses[{{ question.idQuestion }}]" value="{{ question.ResponseProp2 }}"> {{ question.ResponseProp2 }}
+                        </li>
+                        <li>
+                            <input type="radio" name="responses[{{ question.idQuestion }}]" value="{{ question.ResponseProp3 }}"> {{ question.ResponseProp3 }}
+                        </li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Soumettre</button>
+    </form>
+
+    {% if quiz.ScoreQuiz is not null %}
+        <h2>Score : {{ quiz.ScoreQuiz }}</h2>
+    {% endif %}
+
+    <a href="{{ path('app_quiz_list') }}">Retour à la liste</a>
+{% endblock %}

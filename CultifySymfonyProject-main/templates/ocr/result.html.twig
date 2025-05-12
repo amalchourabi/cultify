@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}OCR Results{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>OCR Results</h1>
+        
+        {% if imagePath %}
+            <div class="mb-4">
+                <h3>Processed Image:</h3>
+                <img src="{{ imagePath }}" alt="Processed Image" class="img-fluid rounded">
+            </div>
+        {% endif %}
+        
+        <div class="mb-4">
+            <h3>Extracted Text:</h3>
+            <ul class="list-group">
+                {% for text in texts %}
+                    <li class="list-group-item">{{ text }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <a href="{{ path('ocr_upload') }}" class="btn btn-primary">Process Another Image</a>
+    </div>
+{% endblock %}

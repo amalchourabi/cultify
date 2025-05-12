@@ -1,0 +1,199 @@
+{% extends 'baseback.html.twig' %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('front/css/bootstrap.css') }}">
+    <style>
+        body {
+            padding-top: 120px;
+        }
+
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0);
+            transition: background-color 0.5s ease, padding 0.5s ease;
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        #header.scrolled {
+            background-color: #000;
+            color: white;
+            padding: 10px 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #header.scrolled .nav-menu {
+            opacity: 1;
+        }
+
+        .nav-menu li {
+            margin-right: 20px;
+        }
+
+        .nav-menu li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-menu li a:hover {
+            color: #ccc;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3">Liste des associations ({{ pager.nbResults }})</h1>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" onclick="window.location.href='{{ path('app_association_add') }}'">
+                    Ajouter une association
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une association...">
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="associationsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Contact</th>
+                            <th>But</th>
+                            <th>Montant désiré</th>
+                            <th>Pourcentage</th> 
+                            <th>Site web</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for association in pager.currentPageResults %}
+                        <tr>
+                            <td>{{ association.id }}</td>
+                            <td>{{ association.nom|upper }}</td>
+                            <td>{{ association.description }}</td>
+                            <td>{{ association.contact }}</td>
+                            <td>{{ association.but }}</td>
+                            <td>{{ association.montantDesire }}</td>
+                            <td>{{ association.pourcentageProgression|number_format(1) }}%</td>
+                            <td>
+                                {% if association.siteWeb %}
+                                    <a href="{{ association.siteWeb }}" target="_blank">{{ association.siteWeb }}</a>
+                                {% else %}
+                                    Aucun site web
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if association.image %}
+                                    <img src="{{ asset('uploads/images/' ~ association.image) }}" alt="{{ association.nom }}" width="200">
+                                {% else %}
+                                    Aucune image disponible
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ path('app_association_edit', {'id': association.id }) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                    <a href="{{ path('app_association_delete', {'id': association.id }) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette association ?')">
+                                        <i class="bi bi-trash"></i> Supprimer
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        {{ pagerfanta(pager, 'twitter_bootstrap5') }}
+    </div>
+</div>
+
+<script>
+    const header = document.getElementById('header');
+    let lastScrollTop = 0;
+
+    window.addEventListener('scroll', () => {
+        const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+
+        lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const searchTerm = this.value;
+        fetch(`/associations/search?search=${encodeURIComponent(searchTerm)}`)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector('#associationsTable tbody');
+                tableBody.innerHTML = '';
+
+                data.forEach(association => {
+                    const row = `
+                        <tr>
+                            <td>${association.id}</td>
+                            <td>${association.nom.toUpperCase()}</td>
+                            <td>${association.description || ''}</td>
+                            <td>${association.contact || ''}</td>
+                            <td>${association.but || ''}</td>
+                            <td>${association.montantDesire || ''}</td>
+                            <td>
+                                ${association.siteWeb ? `<a href="${association.siteWeb}" target="_blank">${association.siteWeb}</a>` : 'Aucun site web'}
+                            </td>
+                            <td>
+                                ${association.image ? `<img src="/uploads/images/${association.image}" alt="${association.nom}" width="200">` : 'Aucune image disponible'}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="/association/edit/${association.id}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                    <a href="/association/delete/${association.id}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette association ?')">
+                                        <i class="bi bi-trash"></i> Supprimer
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            })
+            .catch(error => {
+                console.error('Erreur lors de la recherche :', error);
+                alert('Une erreur est survenue lors de la recherche. Veuillez réessayer.');
+            });
+    });
+</script>
+{% endblock %}

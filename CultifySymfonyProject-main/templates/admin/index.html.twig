@@ -1,0 +1,242 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Admin Dashboard - Cultify{% endblock %}
+
+{% block body %}
+    <!-- Sale & Revenue Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-chart-line fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Today's Events</p>
+                        <h6 class="mb-0">15</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-users fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Total Users</p>
+                        <h6 class="mb-0">1,234</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-calendar fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Upcoming Events</p>
+                        <h6 class="mb-0">7</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-ticket-alt fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Tickets Sold</p>
+                        <h6 class="mb-0">456</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Sale & Revenue End -->
+
+    <!-- Charts Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-6">
+                <div class="bg-light text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Event Participation</h6>
+                        <a href="">Show All</a>
+                    </div>
+                    <canvas id="event-participation-chart"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-12 col-xl-6">
+                <div class="bg-light text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">User Growth</h6>
+                        <a href="">Show All</a>
+                    </div>
+                    <canvas id="user-growth-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Charts End -->
+
+    <!-- Recent Events Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-light text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Recent Events</h6>
+                <a href="">Show All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="text-dark">
+                            <th scope="col">Event Name</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Participants</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Cultural Festival</td>
+                            <td>2025-01-15</td>
+                            <td>Main Hall</td>
+                            <td>250</td>
+                            <td>Active</td>
+                            <td><a class="btn btn-sm btn-primary" href="">Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>Art Exhibition</td>
+                            <td>2025-02-10</td>
+                            <td>Gallery</td>
+                            <td>120</td>
+                            <td>Upcoming</td>
+                            <td><a class="btn btn-sm btn-primary" href="">Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>Music Concert</td>
+                            <td>2025-03-05</td>
+                            <td>Outdoor Arena</td>
+                            <td>500</td>
+                            <td>Upcoming</td>
+                            <td><a class="btn btn-sm btn-primary" href="">Details</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Recent Events End -->
+
+    <!-- Widgets Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-md-6 col-xl-4">
+                <div class="h-100 bg-light rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="mb-0">Messages</h6>
+                        <a href="">Show All</a>
+                    </div>
+                    <div class="d-flex align-items-center border-bottom py-3">
+                        <img class="rounded-circle flex-shrink-0" src="{{ asset('backoffice/img/user.jpg') }}" alt="" style="width: 40px; height: 40px;">
+                        <div class="w-100 ms-3">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-0">John Doe</h6>
+                                <small>15 minutes ago</small>
+                            </div>
+                            <span>Can you provide more details about the event?</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center border-bottom py-3">
+                        <img class="rounded-circle flex-shrink-0" src="{{ asset('backoffice/img/user.jpg') }}" alt="" style="width: 40px; height: 40px;">
+                        <div class="w-100 ms-3">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-0">Jane Smith</h6>
+                                <small>30 minutes ago</small>
+                            </div>
+                            <span>I have a question about ticket pricing.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6 col-xl-4">
+                <div class="h-100 bg-light rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Calendar</h6>
+                        <a href="">Show All</a>
+                    </div>
+                    <div id="calendar"></div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6 col-xl-4">
+                <div class="h-100 bg-light rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">To Do List</h6>
+                        <a href="">Show All</a>
+                    </div>
+                    <div class="d-flex mb-2">
+                        <input class="form-control bg-transparent" type="text" placeholder="Enter task">
+                        <button type="button" class="btn btn-primary ms-2">Add</button>
+                    </div>
+                    <div class="d-flex align-items-center border-bottom py-2">
+                        <input class="form-check-input m-0" type="checkbox">
+                        <div class="w-100 ms-3">
+                            <span>Prepare event report</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center border-bottom py-2">
+                        <input class="form-check-input m-0" type="checkbox">
+                        <div class="w-100 ms-3">
+                            <span>Update user database</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Widgets End -->
+{% endblock %}
+
+{% block js %}
+    <script>
+        // Event Participation Chart
+        const ctx1 = document.getElementById('event-participation-chart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Participants',
+                    data: [120, 190, 300, 250, 200, 150],
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // User Growth Chart
+        const ctx2 = document.getElementById('user-growth-chart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Users',
+                    data: [100, 200, 300, 400, 500, 600],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

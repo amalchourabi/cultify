@@ -1,0 +1,35 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Hello QuizController!{% endblock %}
+
+{% block body %}
+<h1> {{ title }} </h1>
+{{ form_start(form,{'attr':{'novalidate':'novalidate'}}) }}
+<table>
+<tr>
+<td>{{ form_label(form.TitreQuiz,"Titre de quiz") }}</td>
+<td>{{form_widget(form.TitreQuiz)}}</td>
+<td>{{form_errors(form.TitreQuiz)}}</td>
+</tr>
+<tr>
+<td>{{ form_label(form.DateQuiz,"date de quiz") }}</td>
+<td>{{form_widget(form.DateQuiz)}}</td>
+<td>{{form_errors(form.DateQuiz)}}</td>
+</tr>
+<tr>
+ <tr>
+    <td>{{ form_label(form.ScoreQuiz, "score de quiz") }}</td>
+    <td>{{ form_widget(form.ScoreQuiz) }}</td>
+    <td>{{ form_errors(form.ScoreQuiz) }}</td>
+</tr>
+
+</tr>
+<tr>
+<td>{{ form_label(form.ReponseChoisit,"reponse choisit") }}</td>
+<td>{{form_widget(form.ReponseChoisit)}}</td>
+<td>{{form_errors(form.ReponseChoisit)}}</td>
+</tr>
+</table>
+{{form_widget(form.save)}} 
+{{form_end(form)}}
+{% endblock %}

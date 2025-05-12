@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}OCR Upload{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Upload Image for OCR</h1>
+        
+        <form method="post" enctype="multipart/form-data" class="border p-4 rounded">
+            <div class="form-group">
+                <label for="image">Select Image:</label>
+                <input type="file" name="image" id="image" 
+                       accept=".jpg,.jpeg,.png,.jfif" 
+                       required
+                       class="form-control-file"
+                       onchange="document.getElementById('fileName').textContent = this.files[0].name">
+                <small class="form-text text-muted">
+                    Supported formats: JPG, JPEG, PNG, JFIF (Max 5MB)
+                </small>
+                <div id="fileName" class="mt-1 text-muted"></div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-3">Process Image</button>
+        </form>
+        
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger mt-3">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endblock %}

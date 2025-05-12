@@ -1,0 +1,27 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Créer une nouvelle réservation{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-4">  {# Added padding-top and margin-top #}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">Créer une nouvelle réservation</h1>
+
+            <div class="card shadow">  {# Added card for better visual structure #}
+                <div class="card-body">
+                    {{ form_start(form, {'method': 'POST', 'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}})}}
+                        {{ form_widget(form) }}
+                        <div class="mt-4">  {# Added margin-top for spacing #}
+                            <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+                            <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-secondary ms-2">
+                                Retour à la liste
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+security:
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_ORGANIZATEUR # Admin inherits Organizer permissions
+        ROLE_ORGANIZATEUR: ROLE_USER        # Organizer inherits User permissions
+
+    access_control:
+        # Restrict access to the admin dashboard to ROLE_ADMIN only
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/promote-to-admin, roles: ROLE_ADMIN }
+        - { path: ^/revoke-admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }  # Example for profile access (commented out)
+
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+            custom_authenticator: App\Security\UserAuthenticator
+            logout:
+              path: /logout
+              target: /login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                always_remember_me: true
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true

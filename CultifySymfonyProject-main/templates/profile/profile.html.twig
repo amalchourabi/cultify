@@ -1,0 +1,147 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Profile - {{ user.username }}{% endblock %}
+
+{% block body %}
+    <div class="container my-5">
+        <!-- Banner Section -->
+        <div class="banner mb-4" style="background: url('{{ asset('path/to/your/banner/image.jpg') }}') no-repeat center center; background-size: cover; height: 200px;">
+            <!-- You can add text or other elements here if you wish -->
+            <div class="d-flex justify-content-center align-items-center h-100">
+                <h2 class="text-white">Welcome to {{ user.username }}'s Profile</h2>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">Profile</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                {% if user.profilepicture %}
+                                    <img src="{{ asset('uploads/' ~ user.profilepicture) }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px;">
+                                        <i class="fas fa-user fa-4x text-secondary"></i>
+                                    </div>
+                                {% endif %}
+                                <h4 class="mb-0">{{ user.username }}</h4>
+                                <p class="text-muted">{{ user.email }}</p>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Full Name:</strong> {{ user.prenom }} {{ user.nom }}</p>
+                                        <p><strong>Phone:</strong> {{ user.numTel }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Gender:</strong> {{ user.gender }}</p>
+                                        <p><strong>Date of Birth:</strong> {{ user.Datedenaissance|date('Y-m-d') }}</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <p><strong>Amount to Pay:</strong> {{ user.MontantApayer }}</p>
+                                <a href="" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Edit Profile
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- OCR Upload Section -->
+                        <div class="mt-5">
+                            <h4>Upload Document for OCR</h4>
+                            <form id="ocrForm" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="document">Choose an image to scan:</label>
+                                    <input type="file" name="document" id="document" class="form-control-file" accept=".jpg,.jpeg,.png" required>
+                                </div>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-scan"></i> Scan Document
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- OCR Results Section -->
+                        <div class="mt-4">
+                            <h4>OCR Results</h4>
+                            <div id="ocrResult" class="alert alert-info">
+                                {% if user.ocrData %}
+                                    <ul class="list-unstyled">
+                                        {% for text in user.ocrData %}
+                                            <li>{{ text }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No OCR data available. Upload a document to scan.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Processed Image Section -->
+                        <div class="mt-4">
+                            <h4>Processed Image</h4>
+                            <div id="processedImage" class="text-center">
+                                {% if user.ocrData and user.ocrData['image_path'] is defined %}
+                                  <img src="{{ user.ocrData['image_path'] }}" alt="Processed Image" class="img-fluid">
+                                {% else %}
+                                    <p>No processed image available.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Handling Form Submission -->
+    <script>
+        document.getElementById('ocrForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('document');
+            formData.append('document', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/user/upload-document', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Display OCR results
+                    const ocrResultDiv = document.getElementById('ocrResult');
+                    ocrResultDiv.innerHTML = `
+                       <ul class="list-unstyled">
+                       ${data.ocr_data.map(text => `<li>${text}</li>`).join('')}
+                        </ul>
+                    `;
+
+                    // Display processed image
+                    const processedImageDiv = document.getElementById('processedImage');
+                    if (data.image_path) {
+                        processedImageDiv.innerHTML = `
+                            <img src="${data.image_path}" alt="Processed Image" class="img-fluid">
+                        `;
+                    } else {
+                        processedImageDiv.innerHTML = `<p>No processed image available.</p>`;
+                    }
+                } else {
+                    // Display error message
+                    const ocrResultDiv = document.getElementById('ocrResult');
+                    ocrResultDiv.innerHTML = `<p class="text-danger">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const ocrResultDiv = document.getElementById('ocrResult');
+                ocrResultDiv.innerHTML = `<p class="text-danger">An error occurred while processing the request.</p>`;
+            }
+        });
+    </script>
+{% endblock %}

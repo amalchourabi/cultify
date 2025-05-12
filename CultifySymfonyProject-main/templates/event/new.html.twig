@@ -1,0 +1,128 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Créer un nouvel événement{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map-container { height: 400px; }
+        .leaflet-container { z-index: 0; }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Créer un nouvel événement</h1>
+
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'event-form'}}) }}
+            {{ form_widget(form) }}
+            
+            <div class="mb-3">
+                {% if form.latitude.vars.errors|length > 0 or form.longitude.vars.errors|length > 0 %}
+                    <div class="alert alert-danger">
+                        Veuillez sélectionner un emplacement valide sur la carte
+                    </div>
+                {% endif %}
+                
+                <button type="button" class="btn btn-secondary mb-4" data-bs-toggle="modal" data-bs-target="#mapModal">
+                    {% if form.latitude.vars.value and form.longitude.vars.value %}
+                        📍 Emplacement sélectionné
+                    {% else %}
+                        🗺️ Sélectionner l'emplacement sur la carte
+                    {% endif %}
+                </button>
+            </div>
+
+            <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+        {{ form_end(form) }}
+    </div>
+
+    <!-- Map Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel">Sélectionner l'emplacement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="map-container"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary" id="confirmLocation">Confirmer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        let map = null;
+        let marker = null;
+
+        // Initialize map when modal is shown
+        document.getElementById('mapModal').addEventListener('shown.bs.modal', function() {
+            if (!map) {
+                // Get initial coordinates from form or default
+                const initialLat = parseFloat(document.getElementById('{{ form.latitude.vars.id }}').value) || 33.892166;
+                const initialLng = parseFloat(document.getElementById('{{ form.longitude.vars.id }}').value) || 9.5615555;
+
+                // Initialize map
+                map = L.map('map-container', {
+                    center: [initialLat, initialLng],
+                    zoom: 7
+                });
+
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                // Initialize marker
+                marker = L.marker([initialLat, initialLng], {
+                    draggable: true
+                }).addTo(map);
+
+                // Update coordinates on map click
+                map.on('click', function(e) {
+                    marker.setLatLng(e.latlng);
+                    updateFormFields(e.latlng);
+                });
+
+                // Update coordinates on marker drag
+                marker.on('dragend', function(e) {
+                    updateFormFields(marker.getLatLng());
+                });
+
+                // Trigger resize after map initialization
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        });
+
+        // Cleanup when modal closes
+        document.getElementById('mapModal').addEventListener('hidden.bs.modal', function() {
+            if (map) {
+                map.remove();
+                map = null;
+                marker = null;
+            }
+        });
+
+        // Handle confirmation button
+        document.getElementById('confirmLocation').addEventListener('click', function() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('mapModal'));
+            modal.hide();
+        });
+
+        function updateFormFields(latlng) {
+            document.getElementById('{{ form.latitude.vars.id }}').value = latlng.lat.toFixed(6);
+            document.getElementById('{{ form.longitude.vars.id }}').value = latlng.lng.toFixed(6);
+            document.querySelector('[data-bs-target="#mapModal"]').innerHTML = '📍 Emplacement sélectionné';
+        }
+    </script>
+{% endblock %}

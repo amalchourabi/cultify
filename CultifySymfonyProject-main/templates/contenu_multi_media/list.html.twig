@@ -1,0 +1,60 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Hello ContenuMultiMediaController!{% endblock %}
+
+{% block body %}
+<h1>encyclopedie</h1>
+<div>
+<h1>encyclopedie</h1>
+<h1>encyclopedie</h1>
+
+<div class="col-lg-4 sidebar">
+                        <div class="single-widget search-widget">
+                            <form class="example" action="{{ path('app_contenu_multi_media_search') }}" method="get" style="margin:auto;max-width:300px">
+                                <input type="text" placeholder="Search Posts" name="q">
+                                <button type="submit"><i class="fa fa-search"></i></button>
+                            </form>                                
+                        </div>
+                    </div>
+<a href="{{ path('app_contenu_multi_media_sort') }}" class="genric-btn success">Trier</a>
+
+{% for i in contenus %}
+<section class="blog-posts-area section-gap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 post-list blog-post-list">
+                <div class="single-post">
+                    
+                    <a href="#">
+                        <h1>
+                            <p><b>{{ i.TitreMedia }}</b></p>
+                        </h1>
+                        <div class="content-wrap">
+                            <p><b></b> {{ i.TextMedia }}</p>
+                            {% if i.PhotoMedia %}
+                                <img src="{{ asset('image/' ~ i.PhotoMedia) }}" alt="{{ i.PhotoMedia }}" height="150px" />
+                            {% else %}
+                                <p>Aucune image disponible</p>
+                            {% endif %}
+                            <p><b>Categorie Media :</b> {{ i.CategorieMedia | upper }}</p>
+                            <p><b>Publication Date :</b> {{ i.DateMedia | date('d-m-Y') }}</p>
+                            <hr>
+                            <div class="button-group-area">
+                                <a href="{{ path('app_contenu_multi_media_pdf', {'idContenu': i.idContenu}) }}" class="genric-btn primary">Télécharger PDF</a>                      
+{% if i.getQuizs() is not empty %}
+    <a href="{{ path('app_quiz_details', {id: i.getQuizs().first.idQuiz}) }}" class="genric-btn info">Quiz</a>
+{% else %}
+    <span class="genric-btn info disabled">Aucun Quiz disponible</span>
+{% endif %}  
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endfor %}
+
+</div>
+{% endblock %}

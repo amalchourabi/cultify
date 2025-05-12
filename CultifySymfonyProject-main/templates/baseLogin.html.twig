@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Login to Cultify and access your account securely.">
+    <title>{% block title %}My Login Page{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('Auth/css/my-login.css') }}">
+    <link rel="icon" href="{{ asset('Auth/img/favicon.ico') }}" type="image/x-icon">
+    {% block css %}{% endblock %}
+</head>
+<body class="my-login-page">
+    <div class="background-slideshow"></div>
+    <section class="h-100">
+        <div class="container h-100">
+            <div class="row justify-content-md-center h-100">
+                <div class="card-wrapper">
+                    <div class="brand">
+                        <img src="{{ asset('Auth/img/Logo.png') }}" alt="logo">
+                    </div>
+                    <div class="card fat">
+                        <div class="card-body">
+                            {% block body %}{% endblock %}
+                        </div>
+                    </div>
+                    <div class="footer">
+                        Copyright &copy; 2025 &mdash; Cultify
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('Auth/js/my-login.js') }}"></script>
+    {% block js %}{% endblock %}
+</body>
+</html>
